@@ -30,11 +30,11 @@ export default function Login({ navigation }) {
   let [password, setPassword] = useState("");
 
   useEffect(() => {
-    console.log(user);
+    // console.log(user);
   }, [user]);
 
   useEffect(() => {
-    console.log(password);
+    // console.log(password);
   }, [password]);
 
   //Animações

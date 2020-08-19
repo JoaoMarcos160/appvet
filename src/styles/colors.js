@@ -17,11 +17,11 @@ const colors = {
 };
 
 export const sizes = {
-  iconDrawer: getPixelSize(10),
+  iconDrawer: getPixelSize(8),
   borderNegocioDePuxarODrawer: getPixelSize(1),
   letraNormal: getPixelSize(7),
   letraGrande: getPixelSize(10),
-  letraPequena: getPixelSize(5),
+  letraPequena: getPixelSize(6),
 };
 
 export default colors;

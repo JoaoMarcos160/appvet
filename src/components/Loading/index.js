@@ -9,7 +9,7 @@ import colors from "../../styles/colors";
 
 export default function Loading() {
   return (
-    <SafeAreaView style={styles.view}>
+    <SafeAreaView style={styles.teste}>
       {/* <Text>Carregando...</Text> */}
       <ActivityIndicator
         style={styles.loading}
@@ -24,6 +24,9 @@ export default function Loading() {
 const styles = StyleSheet.create({
   loading: {
     // backgroundColor: colors.darkblue,
+    margin: "auto",
+    marginVertical: "100%",
+    marginHorizontal: "100%",
     position: "absolute",
     alignSelf: "center",
     alignContent: "center",
@@ -32,4 +35,5 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
   },
+  teste: { position: "relative", width: 50, left: "50%", marginLeft: -25 },
 });
