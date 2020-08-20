@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 
-export default function Loading() {
+export default function Loading(props) {
   return (
     <SafeAreaView style={styles.teste}>
       {/* <Text>Carregando...</Text> */}
@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     margin: "auto",
     marginVertical: "100%",
     marginHorizontal: "100%",
-    position: "absolute",
     alignSelf: "center",
     alignContent: "center",
   },
@@ -35,5 +34,10 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
   },
-  teste: { position: "relative", width: 50, left: "50%", marginLeft: -25 },
+  teste: {
+    position: "relative",
+    width: 50,
+    left: "50%",
+    marginLeft: -25,
+  },
 });

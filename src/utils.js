@@ -1,5 +1,6 @@
-import { Platform, PixelRatio } from "react-native";
+import { Platform, PixelRatio, AsyncStorage } from "react-native";
 import dados from "../dados/users.json";
+import api from "./services/api";
 
 export function getPixelSize(pixels) {
   //pra pegar o tamanho dos pixels e não dar diferença na densidade de pixels em telas maiores ou menores
@@ -9,19 +10,25 @@ export function getPixelSize(pixels) {
   });
 }
 
-export function validarUsuarios(user, password) {
+export async function validarUsuarios(user, password) {
   console.log("User: " + user);
   console.log("Password: " + password);
-  for (let i = 0; i < dados.users.length; i++) {
-    if (dados.users[i].user == user) {
-      if (dados.users[i].password == password) {
-        return true;
-      } else {
-        return "incorrect password";
-      }
-    } else {
-      return "user is not found";
-    }
+  try {
+    const response = await api.get("/Usuarios.php", {
+      login: user,
+      senha: password,
+      tipo: "1",
+    });
+
+    // await AsyncStorage.multiSet([
+    //   ["@appvet:nome", nome],
+    //   ["@appvet:codigo", codigo],
+    //   ["@appvet:permissao", permissao],
+    // ]);
+    return true;
+  } catch (err) {
+    console.log(err);
+    console.log("passei aqui2");
+    return false;
   }
-  return false;
 }

@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Animated,
   Keyboard,
-  Vibration,
   Alert,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -26,8 +25,10 @@ export default function Login({ navigation }) {
   };
 
   const [senhaInvisivel, setSenhaInvisivel] = useState(true);
-  let [user, setUser] = useState("");
-  let [password, setPassword] = useState("");
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
+
+  useEffect(() => {}, [senhaInvisivel]);
 
   useEffect(() => {
     // console.log(user);
@@ -76,8 +77,8 @@ export default function Login({ navigation }) {
 
   //Funções
   function validaUsuario(user, password) {
-    let result = validarUsuarios(user, password);
-    console.log(result);
+    const result = validarUsuarios(user, password);
+    // console.log(result);
     if (result == "user is not found") {
       Alert.alert(
         "Usuario não encontrado!",
@@ -190,8 +191,14 @@ export default function Login({ navigation }) {
         <TouchableOpacity
           style={styles.btnSubmit}
           onPress={() => {
-            // validaUsuario(user, password);
-            navigation.navigate("Home");
+            if (user == "") {
+              Alert.alert("Digite seu usuário!");
+            } else if (password == "") {
+              Alert.alert("Digite sua senha!");
+            } else {
+              validaUsuario(user, password);
+            }
+            // navigation.navigate("Home");
           }}
         >
           <Text style={styles.submitText}>Acessar</Text>

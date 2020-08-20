@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   KeyboardAvoidingView,
@@ -8,18 +8,25 @@ import {
   Alert,
 } from "react-native";
 import Header from "../../components/Header";
-import Loading from "../../components/Loading";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StatusBar } from "expo-status-bar";
 import doencas from "../../../dados/doencas.json";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import colors from "../../styles/colors";
+import Loading from "../../components/Loading";
 
-export default function Doencas({ navigation }) {
+export default function Doencas() {
   const [seachDoenca, setSeachDoenca] = useState("");
-  const [dados, setDados] = useState(doencas.doencas);
-
+  const [dados] = useState(doencas.doencas);
+  const [loading, setLoading] = useState(false);
   const [paginable, setpaginable] = useState(true);
+
+  useEffect(() => {
+    // console.log("passei aqui");
+  }, [seachDoenca]);
+
+  useEffect(() => {
+    console.log(loading);
+  }, [loading]);
 
   function paginar() {
     // console.log(dados.length);
@@ -30,9 +37,13 @@ export default function Doencas({ navigation }) {
 
   //Funções
   const getItem = (data, index) => {
-    // console.log("index: " + index);
-    // console.log("data: " + data[index].nome);
-    // console.log(seachDoenca);
+    if (index >= dados.length) {
+      setLoading(false);
+      // console.log("passei no false");
+    } else {
+      setLoading(true);
+      // console.log("passei no true");
+    }
     paginar();
     let nome = data[index].nome;
     if (nome === undefined) {
@@ -61,14 +72,10 @@ export default function Doencas({ navigation }) {
     } else if (seachDoenca == "") {
       return {
         id: index + 1,
-        nome: data[index].nome, // nome: data[index + 1]["nome"],
+        nome: data[index].nome,
       };
     }
     return null;
-    // return {
-    //   id: index + 1,
-    //   nome: index + 1,
-    // };
   };
 
   const getItemCount = () => {
@@ -91,6 +98,7 @@ export default function Doencas({ navigation }) {
             onSubmitEditing={() => {}}
           />
           <Text style={styles.text}>Doenças localizadas: </Text>
+          {!loading && <Loading />}
           <VirtualizedList
             style={{
               margin: 5,
@@ -100,13 +108,13 @@ export default function Doencas({ navigation }) {
             showsVerticalScrollIndicator={true}
             data={dados}
             initialNumToRender={30}
-            renderItem={({ item, index }) =>
+            renderItem={({ item }) =>
               item && (
                 <TouchableHighlight
                   onPress={() => {
                     Alert.alert(
                       item.nome,
-                      "Detectado clique em " + item.id + ": " + item.nome
+                      "Clique em " + item.id + ": " + item.nome
                     );
                   }}
                 >
