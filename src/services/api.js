@@ -6,12 +6,15 @@ const api = create({
 
 api.addResponseTransform((response) => {
   console.log("duração do request: " + response.duration);
-  console.log(response.config.method);
   if (response.data == null) {
     console.log("status:" + response.status);
+    return false;
+  } else if (response.data.status) {
+    console.log("api status: " + response.data.status);
   } else {
-    console.log("add: " + response.data.nome);
+    console.log("nome: " + response.data.nome);
   }
+  return response;
 });
 
 export default api;

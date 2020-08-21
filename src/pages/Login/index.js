@@ -76,21 +76,23 @@ export default function Login({ navigation }) {
   const inputPassword = useRef(null);
 
   //Funções
-  function validaUsuario(user, password) {
-    const result = validarUsuarios(user, password);
+  async function validaUsuario(user, password) {
+    const result = await validarUsuarios(user, password);
     // console.log(result);
-    if (result == "user is not found") {
+    if (result == "Usuario nao encontrado") {
       Alert.alert(
         "Usuario não encontrado!",
         "Não encotramos seu usuário cadastrado!"
       );
-    } else if (result == "incorrect password") {
+    } else if (result == "Senha incorreta") {
       Alert.alert("Senha incorreta!", "Sua senha está incorreta!\nVerifique");
-    } else if (result) {
+    } else if (result == true) {
       navigation.navigate("Home");
+      return true;
     } else {
-      Alert.alert("Algo deu errado!");
+      Alert.alert("Algo deu errado!", "Contate o desenvolvendor!");
     }
+    return false;
   }
 
   function keyboardDidShow() {
@@ -153,7 +155,7 @@ export default function Login({ navigation }) {
           />
           <TextInput
             style={styles.inputs}
-            placeholder="Email"
+            placeholder="Usuario"
             autoCapitalize="none"
             keyboardType="email-address"
             autoCorrect={false}
@@ -198,13 +200,17 @@ export default function Login({ navigation }) {
             } else {
               validaUsuario(user, password);
             }
-            // navigation.navigate("Home");
           }}
         >
           <Text style={styles.submitText}>Acessar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnRegister}>
+        <TouchableOpacity
+          style={styles.btnRegister}
+          onPress={() => {
+            navigation.navigate("Criar Conta");
+          }}
+        >
           <Text style={styles.registerText}>Criar conta</Text>
         </TouchableOpacity>
       </Animated.View>

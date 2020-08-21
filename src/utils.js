@@ -11,21 +11,32 @@ export function getPixelSize(pixels) {
 }
 
 export async function validarUsuarios(user, password) {
-  console.log("User: " + user);
-  console.log("Password: " + password);
+  // console.log("User: " + user);
+  // console.log("Password: " + password);
   try {
     const response = await api.get("/Usuarios.php", {
       login: user,
       senha: password,
       tipo: "1",
     });
-
-    // await AsyncStorage.multiSet([
-    //   ["@appvet:nome", nome],
-    //   ["@appvet:codigo", codigo],
-    //   ["@appvet:permissao", permissao],
-    // ]);
-    return true;
+    if (!response.ok) {
+      //conexão deu falha
+      if (response.data.status) {
+        console.log(response.data.status);
+      }
+      return false;
+    } else {
+      if (response.data.status) {
+        console.log(response.data.status);
+        return response.data.status;
+      }
+      // await AsyncStorage.multiSet([
+      //   ["@appvet:nome", nome],
+      //   ["@appvet:codigo", codigo],
+      //   ["@appvet:permissao", permissao],
+      // ]);
+      return true;
+    }
   } catch (err) {
     console.log(err);
     console.log("passei aqui2");
