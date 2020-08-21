@@ -38,8 +38,8 @@ export async function validarUsuarios(user, password) {
       return true;
     }
   } catch (err) {
+    console.log("Erro :");
     console.log(err);
-    console.log("passei aqui2");
     return false;
   }
 }

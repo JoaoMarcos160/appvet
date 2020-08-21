@@ -14,6 +14,7 @@ const colors = {
   colorIcon: "#191919",
   colorInput: "#222",
   backgroundLogin: "#191919",
+  backgroundPadrao: "#191919",
 };
 
 export const sizes = {
@@ -22,6 +23,7 @@ export const sizes = {
   letraNormal: getPixelSize(7),
   letraGrande: getPixelSize(10),
   letraPequena: getPixelSize(6),
+  letraInputs: getPixelSize(6),
 };
 
 export default colors;
