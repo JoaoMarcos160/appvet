@@ -1,4 +1,5 @@
 import React from "react";
+import AsyncStorage from "@react-native-community/async-storage";
 import { KeyboardAvoidingView, StyleSheet, Text } from "react-native";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";

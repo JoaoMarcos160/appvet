@@ -1,4 +1,5 @@
 import { Platform, PixelRatio, Alert, ToastAndroid } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 import api from "./services/api";
 import { messages } from "./messages";
 
@@ -10,9 +11,19 @@ export function getPixelSize(pixels) {
   });
 }
 
+async function preencherStorage(usuario) {
+  try {
+    await AsyncStorage.setItem("@appvet:usuario", JSON.stringify(usuario));
+    await AsyncStorage.setItem("@appvet:nome", JSON.stringify(usuario.nome));
+    console.log("Registrado!");
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 export async function validarUsuarios(user, password) {
-  console.log("User: " + user);
-  console.log("Password: " + password);
+  // console.log("User: " + user);
+  // console.log("Password: " + password);
   try {
     const response = await api.get("/Usuarios.php", {
       login: user,
@@ -42,11 +53,8 @@ export async function validarUsuarios(user, password) {
       }
       return false;
     }
-    // await AsyncStorage.multiSet([
-    //   ["@Appvet:nome", nome],
-    //   ["@Appvet:codigo", codigo],
-    //   ["@Appvet:permissao", permissao],
-    // ]);
+    await preencherStorage(response.data);
+    // console.log(AsyncStorage.getItem("@appvet:data_criacao"));
     ToastAndroid.showWithGravity(
       messages.login_sucesso,
       ToastAndroid.SHORT,
