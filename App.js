@@ -23,7 +23,7 @@ import {
   faUserCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import colors, { sizes } from "./src/styles/colors";
-import { SafeAreaView } from "react-native-safe-area-context";
+// import { SafeAreaView } from "react-native-safe-area-context";
 
 const Drawer = createDrawerNavigator();
 

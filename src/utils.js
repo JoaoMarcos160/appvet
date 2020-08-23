@@ -1,6 +1,6 @@
-import { Platform, PixelRatio, AsyncStorage } from "react-native";
-import dados from "../dados/users.json";
+import { Platform, PixelRatio, Alert, ToastAndroid } from "react-native";
 import api from "./services/api";
+import { messages } from "./messages";
 
 export function getPixelSize(pixels) {
   //pra pegar o tamanho dos pixels e não dar diferença na densidade de pixels em telas maiores ou menores
@@ -11,35 +11,77 @@ export function getPixelSize(pixels) {
 }
 
 export async function validarUsuarios(user, password) {
-  // console.log("User: " + user);
-  // console.log("Password: " + password);
+  console.log("User: " + user);
+  console.log("Password: " + password);
   try {
     const response = await api.get("/Usuarios.php", {
       login: user,
       senha: password,
       tipo: "1",
     });
-    if (!response.ok) {
-      //conexão deu falha
-      if (response.data.status) {
-        console.log(response.data.status);
+    // console.log(response);
+    //colocar as c]validações vindas da api
+    if (typeof response.data.status == "string") {
+      switch (response.data.status) {
+        case "Usuario nao encontrado":
+          Alert.alert(
+            messages.usuario_nao_encontrado,
+            messages.tente_novamente
+          );
+          break;
+        case "Senha incorreta":
+          Alert.alert(messages.senha_incorreta, messages.tente_novamente);
+          break;
+        case "Sem conexao com o BD":
+          Alert.alert(messages.sem_conexao_BD, messages.contato_dev);
+          break;
+        default:
+          console.log(response.data.status);
+          Alert.alert(messages.falha_login, messages.contato_dev);
+          break;
       }
       return false;
-    } else {
-      if (response.data.status) {
-        console.log(response.data.status);
-        return response.data.status;
-      }
-      // await AsyncStorage.multiSet([
-      //   ["@appvet:nome", nome],
-      //   ["@appvet:codigo", codigo],
-      //   ["@appvet:permissao", permissao],
-      // ]);
-      return true;
     }
-  } catch (err) {
-    console.log("Erro :");
-    console.log(err);
+    // await AsyncStorage.multiSet([
+    //   ["@Appvet:nome", nome],
+    //   ["@Appvet:codigo", codigo],
+    //   ["@Appvet:permissao", permissao],
+    // ]);
+    ToastAndroid.showWithGravity(
+      messages.login_sucesso,
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER
+    );
+    return true;
+  } catch (response) {
+    console.log("ENTREI NO CATCH");
+    switch (response.problem) {
+      case "NETWORK_ERROR":
+        Alert.alert(messages.sem_conexao_com_internet);
+        console.log("sem conexão com a internet", messages.erro);
+        // return messages.sem_conexao_com_internet;
+        break;
+      case "CONNECTION_ERROR":
+        Alert.alert(messages.sem_conexao, messages.erro);
+        console.log("Erro de conexão");
+        // return messages.sem_conexao;
+        break;
+      case "SERVER_ERROR":
+        Alert.alert(messages.sem_conexao, messages.erro);
+        console.log("erro com ose servidor");
+        // return messages.sem_conexao;
+        break;
+      case "TIMEOUT_ERROR":
+        Alert.alert(messages.tempo_excedido, messages.erro);
+        console.log("Tempo de conexão excedido");
+        break;
+      // return messages.tempo_excedido;
+      default:
+        Alert.alert(messages.algo_deu_errado, messages.contato_dev);
+        console.log("Erro desconhecido");
+        //vai retornar falso lá embaixo
+        break;
+    }
     return false;
   }
 }

@@ -141,8 +141,6 @@ const styles = StyleSheet.create({
   },
   viewRowIcon: {
     flexDirection: "row",
-    // borderColor: "red",
-    // borderWidth: 1,
   },
   icon: {
     textAlignVertical: "center",

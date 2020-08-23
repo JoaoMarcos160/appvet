@@ -77,22 +77,16 @@ export default function Login({ navigation }) {
 
   //Funções
   async function validaUsuario(user, password) {
-    const result = await validarUsuarios(user, password);
-    // console.log(result);
-    if (result == "Usuario nao encontrado") {
-      Alert.alert(
-        "Usuario não encontrado!",
-        "Não encotramos seu usuário cadastrado!"
-      );
-    } else if (result == "Senha incorreta") {
-      Alert.alert("Senha incorreta!", "Sua senha está incorreta!\nVerifique");
-    } else if (result == true) {
-      navigation.navigate("Home");
-      return true;
+    if (user == "") {
+      Alert.alert("Digite seu usuário!");
+    } else if (password == "") {
+      Alert.alert("Digite sua senha!");
     } else {
-      Alert.alert("Algo deu errado!", "Contate o desenvolvendor!");
+      const result = await validarUsuarios(user, password);
+      if (result === true) {
+        navigation.navigate("Home");
+      }
     }
-    return false;
   }
 
   function keyboardDidShow() {
@@ -193,13 +187,7 @@ export default function Login({ navigation }) {
         <TouchableOpacity
           style={styles.btnSubmit}
           onPress={() => {
-            if (user == "") {
-              Alert.alert("Digite seu usuário!");
-            } else if (password == "") {
-              Alert.alert("Digite sua senha!");
-            } else {
-              validaUsuario(user, password);
-            }
+            validaUsuario(user, password);
           }}
         >
           <Text style={styles.submitText}>Acessar</Text>
