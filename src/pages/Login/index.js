@@ -9,12 +9,13 @@ import {
   Animated,
   Keyboard,
   Alert,
+  ProgressBarAndroid,
+  Platform,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faAddressCard, faLock } from "@fortawesome/free-solid-svg-icons";
 import colors from "../../styles/colors";
 import icon from "../../../assets/icon.png";
-import { StatusBar } from "expo-status-bar";
 import Loading from "../../components/Loading";
 import { validarUsuarios } from "../../utils";
 
@@ -24,19 +25,14 @@ export default function Login({ navigation }) {
     y: 140,
   };
 
-  const [senhaInvisivel, setSenhaInvisivel] = useState(true);
+  const [] = useState(true);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-
-  useEffect(() => {}, [senhaInvisivel]);
-
-  useEffect(() => {
-    // console.log(user);
-  }, [user]);
+  const [btnAcessarDisable, setBtnAcessarDisable] = useState(false);
 
   useEffect(() => {
-    // console.log(password);
-  }, [password]);
+    console.log(btnAcessarDisable);
+  }, [btnAcessarDisable]);
 
   //Animações
   const [offset] = useState(new Animated.ValueXY({ x: 0, y: 100 }));
@@ -79,11 +75,14 @@ export default function Login({ navigation }) {
   async function validaUsuario(user, password) {
     if (user == "") {
       Alert.alert("Digite seu usuário!");
+      setBtnAcessarDisable(false);
     } else if (password == "") {
       Alert.alert("Digite sua senha!");
+      setBtnAcessarDisable(false);
     } else {
       const result = await validarUsuarios(user, password);
       if (result === true) {
+        setBtnAcessarDisable(false);
         navigation.navigate("Home");
       }
     }
@@ -121,7 +120,6 @@ export default function Login({ navigation }) {
 
   return (
     <KeyboardAvoidingView style={styles.background}>
-      <StatusBar style="light" />
       <View style={styles.containerLogo}>
         <Animated.Image
           style={{
@@ -179,6 +177,7 @@ export default function Login({ navigation }) {
               setPassword(password);
             }}
             onSubmitEditing={() => {
+              setBtnAcessarDisable(true);
               validaUsuario(user, password);
             }}
             ref={inputPassword}
@@ -186,7 +185,9 @@ export default function Login({ navigation }) {
         </View>
         <TouchableOpacity
           style={styles.btnSubmit}
+          disabled={btnAcessarDisable}
           onPress={() => {
+            setBtnAcessarDisable(true);
             validaUsuario(user, password);
           }}
         >
@@ -202,9 +203,8 @@ export default function Login({ navigation }) {
           <Text style={styles.registerText}>Criar conta</Text>
         </TouchableOpacity>
       </Animated.View>
-      {/* <View>
-        <Loading />
-      </View> */}
+      {btnAcessarDisable &&
+        (Platform.OS == "android" ? <ProgressBarAndroid /> : <Loading />)}
     </KeyboardAvoidingView>
   );
 }

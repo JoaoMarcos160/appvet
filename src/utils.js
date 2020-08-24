@@ -11,6 +11,16 @@ export function getPixelSize(pixels) {
   });
 }
 
+export async function carregarUsuario() {
+  try {
+    const user = JSON.parse(await AsyncStorage.getItem("@appvet:usuario"));
+    return user;
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
+}
+
 async function preencherStorage(usuario) {
   try {
     await AsyncStorage.setItem("@appvet:usuario", JSON.stringify(usuario));
@@ -19,6 +29,17 @@ async function preencherStorage(usuario) {
   } catch (e) {
     console.log(e);
   }
+}
+export async function criarUsuario(nome, login, senha, permissao) {
+  try {
+    const response = await api.post("/Usuarios.php", {
+      nome: nome,
+      login: login,
+      senha: senha,
+      permissao: permissao,
+    });
+    console.log(response.data);
+  } catch (error) {}
 }
 
 export async function validarUsuarios(user, password) {
@@ -30,8 +51,6 @@ export async function validarUsuarios(user, password) {
       senha: password,
       tipo: "1",
     });
-    // console.log(response);
-    //colocar as c]validações vindas da api
     if (typeof response.data.status == "string") {
       switch (response.data.status) {
         case "Usuario nao encontrado":

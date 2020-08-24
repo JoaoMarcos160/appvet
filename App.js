@@ -23,6 +23,7 @@ import {
   faUserCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import colors, { sizes } from "./src/styles/colors";
+import { StatusBar } from "expo-status-bar";
 // import { SafeAreaView } from "react-native-safe-area-context";
 
 const Drawer = createDrawerNavigator();
@@ -30,6 +31,7 @@ const Drawer = createDrawerNavigator();
 export default function App() {
   return (
     <NavigationContainer>
+      <StatusBar style="light" />
       <Drawer.Navigator
         initialRouteName="Login"
         // overlayColor={colors.drawerColor}

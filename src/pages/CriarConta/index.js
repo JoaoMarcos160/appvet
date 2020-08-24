@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   TextInput,
   TouchableHighlight,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import colors, { sizes } from "../../styles/colors";
@@ -21,9 +22,68 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { getPixelSize } from "../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { color } from "react-native-reanimated";
+import { color, log } from "react-native-reanimated";
 
 export default function CriarConta() {
+  const [nome, setNome] = useState("");
+  const [login, setLogin] = useState("");
+  const [senha, setSenha] = useState("");
+  const [senhaConfirm, setSenhaConfirm] = useState("");
+  // useEffect(() => {
+  //   console.log(nome);
+  // }, [nome]);
+  // useEffect(() => {
+  //   console.log(login);
+  // }, [login]);
+  // useEffect(() => {
+  //   console.log(senha);
+  // }, [senha]);
+  // useEffect(() => {
+  //   console.log(senhaConfirm);
+  // }, [senhaConfirm]);
+
+  //Referencias dos componentes
+  const inputNome = useRef(null);
+  const inputLogin = useRef(null);
+  const inputSenha = useRef(null);
+  const inputSenhaConfirm = useRef(null);
+
+  //Funções
+  async function criarUser() {
+    console.log(nome);
+    console.log(login);
+    console.log(senha);
+    console.log(senhaConfirm);
+    if (nome == "") {
+      Alert.alert("Digite seu nome");
+      inputNome.current.focus();
+    } else if ("" == login) {
+      Alert.alert("Digite um login");
+      inputLogin.current.focus();
+    } else if ("" == senha) {
+      Alert.alert("Digite uma senha");
+      inputSenha.current.focus();
+    } else if ("" == senhaConfirm) {
+      Alert.alert("Confime sua senha");
+      inputSenhaConfirm.current.focus();
+    } else if (senha !== senhaConfirm) {
+      Alert.alert(
+        "As senhas não coincidem!",
+        "As senhas não estão iguais, verifique!"
+      );
+      inputSenha.current.clear();
+      inputSenhaConfirm.current.clear();
+      inputSenha.current.focus();
+    } else if (senha.length < 6) {
+      Alert.alert(
+        "Senha muito pequena!",
+        "Digite uma senha com pelo menos 6 caracteres"
+      );
+    } else {
+      console.log("tudo certo");
+    }
+  }
+
   return (
     <SafeAreaView style={styles.background}>
       <Header title="Crie sua conta" />
@@ -42,6 +102,10 @@ export default function CriarConta() {
               style={styles.textInput}
               placeholder="Digite seu nome aqui"
               autoCompleteType="name"
+              onChangeText={(nome) => {
+                setNome(nome);
+              }}
+              ref={inputNome}
             />
           </View>
           <View style={styles.viewInput}>
@@ -57,6 +121,10 @@ export default function CriarConta() {
               style={styles.textInput}
               placeholder="Digite um nome de usuário aqui"
               autoCompleteType="email"
+              onChangeText={(login) => {
+                setLogin(login);
+              }}
+              ref={inputLogin}
             />
           </View>
           <View style={styles.viewInput}>
@@ -73,6 +141,10 @@ export default function CriarConta() {
               placeholder="Digite uma senha"
               autoCompleteType="password"
               secureTextEntry={true}
+              onChangeText={(senha) => {
+                setSenha(senha);
+              }}
+              ref={inputSenha}
             />
           </View>
           <View style={styles.viewInput}>
@@ -89,9 +161,13 @@ export default function CriarConta() {
               placeholder="Repita sua senha"
               autoCompleteType="password"
               secureTextEntry={true}
+              onChangeText={(senhaconfirm) => {
+                setSenhaConfirm(senhaconfirm);
+              }}
+              ref={inputSenhaConfirm}
             />
           </View>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => criarUser()}>
             <Text style={styles.textButton}>CRIAR CONTA</Text>
           </TouchableOpacity>
         </ScrollView>

@@ -1,16 +1,10 @@
 import React from "react";
-import {
-  StyleSheet,
-  SafeAreaView,
-  Text,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, SafeAreaView, ActivityIndicator } from "react-native";
 import colors from "../../styles/colors";
 
-export default function Loading(props) {
+export default function Loading() {
   return (
     <SafeAreaView style={styles.teste}>
-      {/* <Text>Carregando...</Text> */}
       <ActivityIndicator
         style={styles.loading}
         size="large"
@@ -23,21 +17,15 @@ export default function Loading(props) {
 
 const styles = StyleSheet.create({
   loading: {
-    // backgroundColor: colors.darkblue,
     margin: "auto",
-    marginVertical: "100%",
-    marginHorizontal: "100%",
     alignSelf: "center",
     alignContent: "center",
   },
-  view: {
-    height: 50,
-    width: 50,
-  },
   teste: {
     position: "relative",
-    width: 50,
-    left: "50%",
-    marginLeft: -25,
+    flex: 1,
+    maxHeight: 50,
+    maxWidth: "100%",
+    margin: 30,
   },
 });
