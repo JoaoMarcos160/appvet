@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   Alert,
+  View,
 } from "react-native";
 import Header from "../../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,6 +14,7 @@ import doencas from "../../../dados/doencas.json";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import colors from "../../styles/colors";
 import Loading from "../../components/Loading";
+import ItemList from "../../components/ItemList";
 
 export default function Doencas() {
   const [seachDoenca, setSeachDoenca] = useState("");
@@ -37,6 +39,7 @@ export default function Doencas() {
 
   //Funções
   const getItem = (data, index) => {
+    // console.log(index);
     if (index >= dados.length) {
       setLoading(false);
       // console.log("passei no false");
@@ -97,7 +100,17 @@ export default function Doencas() {
             }}
             onSubmitEditing={() => {}}
           />
-          <Text style={styles.text}>Doenças localizadas: </Text>
+          <View style={{ flexDirection: "row" }}>
+            {seachDoenca == "" ? (
+              <Text style={{ ...styles.text, textAlign: "right" }}>
+                Total de doenças: {dados.length}
+              </Text>
+            ) : (
+              <Text style={{ ...styles.text, textAlign: "left" }}>
+                Doenças localizadas:
+              </Text>
+            )}
+          </View>
           {!loading && <Loading />}
           <VirtualizedList
             style={{
@@ -118,10 +131,7 @@ export default function Doencas() {
                     );
                   }}
                 >
-                  <Text style={styles.itemLista}>
-                    {/* {index}: {item.nome} */}
-                    {item.nome}
-                  </Text>
+                  <ItemList key={item.id}>{item.nome}</ItemList>
                 </TouchableHighlight>
               )
             }
@@ -133,7 +143,9 @@ export default function Doencas() {
             }}
             getItemCount={getItemCount}
             getItem={getItem}
-            ListEmptyComponent={<Text>Sem itens na lista!</Text>}
+            ListEmptyComponent={
+              <Text style={styles.text}>Sem itens na lista!</Text>
+            }
             pagingEnabled={paginable}
           />
         </SafeAreaView>
@@ -146,16 +158,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.backgroundLogin,
-  },
-  itemLista: {
-    textAlign: "center",
-    padding: 1,
-    margin: 2,
-    paddingBottom: 5,
-    fontSize: 18,
-    borderBottomColor: colors.letraNormalClaro,
-    borderBottomWidth: 1,
-    color: colors.letraNormalClaro,
   },
   view: {
     alignContent: "center",
