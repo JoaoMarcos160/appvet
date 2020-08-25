@@ -17,7 +17,10 @@ export default function Home() {
       .catch((error) => {
         console.warn(error);
       });
-    return console.log("desmontando usuario");
+    return () => {
+      // setUser(null);
+      console.log("desmontando user");
+    };
   }, [user]);
 
   return (
@@ -26,7 +29,7 @@ export default function Home() {
         <Header title="Home" />
 
         {user !== null ? (
-          <Text style={styles.text}>Bem-vindo(a) ao AppVet {user}</Text>
+          <Text style={styles.text}>Bem-vindo(a) {user}</Text>
         ) : (
           <Loading />
         )}

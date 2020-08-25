@@ -1,37 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  KeyboardAvoidingView,
-  TextInput,
-  TouchableHighlight,
-  Alert,
-} from "react-native";
+import { StyleSheet, Text, View, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import colors, { sizes } from "../../styles/colors";
 import Header from "../../components/Header";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import {
-  faCalculator,
   faLock,
   faUserAlt,
-  faUserAltSlash,
-  faUserAstronaut,
   faUserCircle,
+  faCheckSquare,
 } from "@fortawesome/free-solid-svg-icons";
-import { getPixelSize } from "../../utils";
+import { getPixelSize, criarUsuario } from "../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { color, log } from "react-native-reanimated";
+import CheckBox from "../../components/CheckBox";
 
-export default function CriarConta() {
+export default function CriarConta({ navigation }) {
   const [nome, setNome] = useState("");
   const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
   const [senhaConfirm, setSenhaConfirm] = useState("");
-  // useEffect(() => {
-  //   console.log(nome);
-  // }, [nome]);
+  const [termosDeUso, setTermosDeUso] = useState(false);
+  useEffect(() => {
+    console.log(termosDeUso);
+  }, [termosDeUso]);
   // useEffect(() => {
   //   console.log(login);
   // }, [login]);
@@ -49,13 +40,23 @@ export default function CriarConta() {
   const inputSenhaConfirm = useRef(null);
 
   //Funções
+  function handleCheckTermos() {
+    setTermosDeUso(!termosDeUso);
+  }
+
   async function criarUser() {
-    console.log(nome);
-    console.log(login);
-    console.log(senha);
-    console.log(senhaConfirm);
+    // console.log(nome);
+    // console.log(login);
+    // console.log(senha);
+    // console.log(senhaConfirm);
     if (nome == "") {
       Alert.alert("Digite seu nome");
+      inputNome.current.focus();
+    } else if (nome.length < 3) {
+      Alert.alert("Nome inválido");
+      inputNome.current.focus();
+    } else if (nome.search(" ") < 0) {
+      Alert.alert("Digite seu nome completo");
       inputNome.current.focus();
     } else if ("" == login) {
       Alert.alert("Digite um login");
@@ -79,8 +80,18 @@ export default function CriarConta() {
         "Senha muito pequena!",
         "Digite uma senha com pelo menos 6 caracteres"
       );
+    } else if (!termosDeUso) {
+      Alert.alert(
+        "Aceite nossos termos de uso!",
+        "Leia atentamente nossos termos de uso do App! 😊"
+      );
     } else {
       console.log("tudo certo");
+      const result = await criarUsuario(nome, login, senha, 1, navigation);
+      if (!result) {
+        inputLogin.current.clear();
+        inputLogin.current.focus();
+      }
     }
   }
 
@@ -115,12 +126,13 @@ export default function CriarConta() {
                 icon={faUserAlt}
                 color={colors.letraNormalClaro}
               />
-              <Text style={styles.text}>Login: </Text>
+              <Text style={styles.text}>Login (Nome de Usuário):</Text>
             </View>
             <TextInput
               style={styles.textInput}
               placeholder="Digite um nome de usuário aqui"
               autoCompleteType="email"
+              autoCapitalize="none"
               onChangeText={(login) => {
                 setLogin(login);
               }}
@@ -134,7 +146,7 @@ export default function CriarConta() {
                 icon={faLock}
                 color={colors.letraNormalClaro}
               />
-              <Text style={styles.text}>Senha: </Text>
+              <Text style={styles.text}>Senha (mín. 6 caracteres): </Text>
             </View>
             <TextInput
               style={styles.textInput}
@@ -167,8 +179,33 @@ export default function CriarConta() {
               ref={inputSenhaConfirm}
             />
           </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              alignContent: "center",
+            }}
+          >
+            <View style={{ marginLeft: getPixelSize(5) }}>
+              <CheckBox
+                checkColor={colors.letraNormalClaro}
+                iconColor={colors.letraNormalClaro}
+                label="Li e aceito os termos de uso"
+                labelStyle={styles.text}
+                icon={faCheckSquare}
+                showIconInBox={termosDeUso}
+                sizeIcon={16}
+                onChange={handleCheckTermos}
+              />
+            </View>
+          </View>
           <TouchableOpacity style={styles.button} onPress={() => criarUser()}>
-            <Text style={styles.textButton}>CRIAR CONTA</Text>
+            <Text style={styles.textButton}>Criar conta</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.btnLogin}>
+              Já tem uma conta? Faça login aqui
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -177,14 +214,21 @@ export default function CriarConta() {
 }
 
 const styles = StyleSheet.create({
+  btnLogin: {
+    color: colors.letraNormalClaro,
+    margin: 2,
+    alignSelf: "center",
+    fontStyle: "italic",
+    textDecorationLine: "underline",
+    // borderColor: "red",
+    // borderWidth: 1,
+  },
   container: {
     flex: 1,
     width: "100%",
     alignItems: "stretch",
     alignSelf: "center",
     justifyContent: "space-between",
-    // borderColor: "red",
-    // borderWidth: 1,
   },
   background: {
     flex: 1,
@@ -236,7 +280,7 @@ const styles = StyleSheet.create({
     borderColor: colors.titulos,
     borderWidth: 1,
     borderRadius: 12,
-    backgroundColor: colors.corBoxes,
+    backgroundColor: colors.botoes,
   },
   textButton: {
     flex: 1,

@@ -3,7 +3,7 @@ import { getPixelSize } from "../utils";
 const colors = {
   primary: "#4169e1",
   rota: "#4169e1",
-  botoes: "#4169e1",
+  botoes: "#35aaff",
   letraPesquisas: "#808080",
   letraNormal: "#000001",
   letraNormalClaro: "#fffffe",

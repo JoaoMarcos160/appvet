@@ -131,12 +131,13 @@ export default function Doencas() {
                     );
                   }}
                 >
-                  <ItemList key={item.id}>{item.nome}</ItemList>
+                  <ItemList key={toString(item.id)}>{item.nome}</ItemList>
                 </TouchableHighlight>
               )
             }
             keyExtractor={(item) => {
-              if (item == null) {
+              if (item == null || item == undefined) {
+                console.log("passei aqui!");
                 return Math.random();
               }
               return item.id;

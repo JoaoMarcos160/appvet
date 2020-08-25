@@ -11,4 +11,7 @@ export const messages = {
   falha_login: "Falha ao fazer login",
   tente_novamente: "Tente novamente",
   login_sucesso: "Login realizado com sucesso!",
+  usuario_ja_existe: "Nome de usuário já existe",
+  falha_criar_conta: "Falha ao criar sua conta!",
+  criar_conta_sucesso: "Conta criada com sucesso!",
 };

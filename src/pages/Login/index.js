@@ -84,6 +84,8 @@ export default function Login({ navigation }) {
       if (result === true) {
         setBtnAcessarDisable(false);
         navigation.navigate("Home");
+      } else {
+        setBtnAcessarDisable(false);
       }
     }
   }

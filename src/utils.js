@@ -13,8 +13,9 @@ export function getPixelSize(pixels) {
 
 export async function carregarUsuario() {
   try {
-    const user = JSON.parse(await AsyncStorage.getItem("@appvet:usuario"));
-    return user;
+    const user = await AsyncStorage.getItem("@appvet:usuario");
+    const userJson = JSON.parse(user);
+    return userJson;
   } catch (error) {
     console.warn(error);
     return false;
@@ -23,23 +24,76 @@ export async function carregarUsuario() {
 
 async function preencherStorage(usuario) {
   try {
+    await AsyncStorage.clear();
+    // await AsyncStorage.multiRemove(["@appvet:usuario"]["@appvet:nome"]);
     await AsyncStorage.setItem("@appvet:usuario", JSON.stringify(usuario));
     await AsyncStorage.setItem("@appvet:nome", JSON.stringify(usuario.nome));
     console.log("Registrado!");
   } catch (e) {
+    console.log("deu erro no async");
     console.log(e);
   }
 }
-export async function criarUsuario(nome, login, senha, permissao) {
+export async function criarUsuario(nome, login, senha, permissao, navigation) {
+  console.log(nome);
   try {
-    const response = await api.post("/Usuarios.php", {
-      nome: nome,
-      login: login,
-      senha: senha,
-      permissao: permissao,
+    let url = "/Usuarios.php";
+    const response = await api.any({
+      method: "POST",
+      url: "/Usuarios.php",
+      params: { nome: nome, login: login, senha: senha, permissao: permissao },
     });
-    console.log(response.data);
-  } catch (error) {}
+    // console.log(response.data);
+    if (typeof response.data.status == "string") {
+      switch (response.data.status) {
+        case "Nome ja existe":
+          Alert.alert(
+            messages.usuario_ja_existe,
+            "Encontramos uma conta com esse nome de usuário, você já tem uma conta?",
+            [
+              {
+                text: "Sim",
+                onPress: () => navigation.navigate("Login"),
+              },
+              {
+                text: "Tentar outro nome de usuário",
+                onPress: () => {
+                  return false;
+                },
+                style: "cancel",
+              },
+            ],
+            {
+              cancelable: false,
+            }
+          );
+          break;
+        case "Sucesso":
+          await preencherStorage({
+            nome: nome,
+            login: login,
+            permissao: permissao,
+          });
+          navigation.navigate("Home");
+          ToastAndroid.showWithGravity(
+            messages.criar_conta_sucesso,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER
+          );
+          break;
+        case "Sem conexao com o BD":
+          Alert.alert(messages.sem_conexao_BD, messages.contato_dev);
+          break;
+        default:
+          console.log(response.data.status);
+          Alert.alert(messages.falha_login, messages.contato_dev);
+          break;
+      }
+      return false;
+    }
+  } catch (error) {
+    console.warn(error);
+  }
 }
 
 export async function validarUsuarios(user, password) {
