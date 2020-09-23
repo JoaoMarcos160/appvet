@@ -15,6 +15,7 @@ export async function carregarUsuario() {
   try {
     const user = await AsyncStorage.getItem("@appvet:usuario");
     const userJson = JSON.parse(user);
+    console.log(userJson);
     return userJson;
   } catch (error) {
     console.warn(error);
@@ -22,18 +23,35 @@ export async function carregarUsuario() {
   }
 }
 
-async function preencherStorage(usuario) {
+async function preencherUsuario(usuario_id) {
   try {
     await AsyncStorage.clear();
-    // await AsyncStorage.multiRemove(["@appvet:usuario"]["@appvet:nome"]);
-    await AsyncStorage.setItem("@appvet:usuario", JSON.stringify(usuario));
-    await AsyncStorage.setItem("@appvet:nome", JSON.stringify(usuario.nome));
-    console.log("Registrado!");
+    const response = await api.get("/usuarios/" + usuario_id);
+    if (response.data.data.id) {
+      await AsyncStorage.setItem(
+        "@appvet:usuario",
+        JSON.stringify(response.data.data)
+      );
+      console.log("Registrado!");
+    }
   } catch (e) {
     console.log("deu erro no async");
+    if (e.data.data.msg) {
+      Alert.alert(e.data.data.msg);
+      console.log(e);
+    }
+  }
+}
+
+async function preencherToken(token) {
+  try {
+    await AsyncStorage.setItem("@appvet:token", token);
+    console.log("Token registrado!");
+  } catch (e) {
     console.log(e);
   }
 }
+
 export async function criarUsuario(nome, login, senha, permissao, navigation) {
   console.log(nome);
   try {
@@ -100,40 +118,26 @@ export async function validarUsuarios(user, password) {
   // console.log("User: " + user);
   // console.log("Password: " + password);
   try {
-    const response = await api.get("/Usuarios.php", {
+    const response = await api.post("/usuarios/login", {
       login: user,
       senha: password,
-      tipo: "1",
     });
-    if (typeof response.data.status == "string") {
-      switch (response.data.status) {
-        case "Usuario nao encontrado":
-          Alert.alert(
-            messages.usuario_nao_encontrado,
-            messages.tente_novamente
-          );
-          break;
-        case "Senha incorreta":
-          Alert.alert(messages.senha_incorreta, messages.tente_novamente);
-          break;
-        case "Sem conexao com o BD":
-          Alert.alert(messages.sem_conexao_BD, messages.contato_dev);
-          break;
-        default:
-          console.log(response.data.status);
-          Alert.alert(messages.falha_login, messages.contato_dev);
-          break;
-      }
-      return false;
+    // console.log(response.data.data);
+    if (response.data.data.msg == "Sucesso") {
+      // await preencherStorage(response.data);
+      await AsyncStorage.clear();
+      await preencherToken(response.data.data.token);
+      await preencherUsuario(response.data.data.id);
+      // console.log(AsyncStorage.getItem("@appvet:data_criacao"));
+      ToastAndroid.showWithGravity(
+        messages.login_sucesso,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+      return true;
     }
-    await preencherStorage(response.data);
-    // console.log(AsyncStorage.getItem("@appvet:data_criacao"));
-    ToastAndroid.showWithGravity(
-      messages.login_sucesso,
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER
-    );
-    return true;
+    Alert.alert(response.data.data.msg);
+    return false;
   } catch (response) {
     console.log("ENTREI NO CATCH");
     switch (response.problem) {
@@ -149,7 +153,7 @@ export async function validarUsuarios(user, password) {
         break;
       case "SERVER_ERROR":
         Alert.alert(messages.sem_conexao, messages.erro);
-        console.log("erro com ose servidor");
+        console.log("erro com o servidor");
         // return messages.sem_conexao;
         break;
       case "TIMEOUT_ERROR":

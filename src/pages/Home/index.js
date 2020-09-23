@@ -8,11 +8,12 @@ import { carregarUsuario } from "../../utils";
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const [user_nome, setUser_nome] = useState(null);
 
   useEffect(() => {
     carregarUsuario()
-      .then((user) => {
-        setUser(user.nome);
+      .then((usuario) => {
+        setUser_nome(usuario.nome);
       })
       .catch((error) => {
         console.warn(error);
@@ -28,8 +29,8 @@ export default function Home() {
       <KeyboardAvoidingView>
         <Header title="Home" />
 
-        {user !== null ? (
-          <Text style={styles.text}>Bem-vindo(a) {user}</Text>
+        {user_nome !== null ? (
+          <Text style={styles.text}>Bem-vindo(a) {user_nome}</Text>
         ) : (
           <Loading />
         )}

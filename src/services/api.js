@@ -2,7 +2,7 @@ import { create } from "apisauce";
 
 const api = create({
   timeout: 20000, //20 segundos
-  baseURL: "http://192.168.0.129/appvet/requests",
+  baseURL: "http://192.168.0.129:80/api",
   // baseURL: "https://pablo.atmun.com/TCC/Telas/requests",
 });
 

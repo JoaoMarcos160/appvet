@@ -30,9 +30,9 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [btnAcessarDisable, setBtnAcessarDisable] = useState(false);
 
-  useEffect(() => {
-    console.log(btnAcessarDisable);
-  }, [btnAcessarDisable]);
+  // useEffect(() => {
+  //   console.log(btnAcessarDisable);
+  // }, [btnAcessarDisable]);
 
   //Animações
   const [offset] = useState(new Animated.ValueXY({ x: 0, y: 100 }));
