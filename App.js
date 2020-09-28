@@ -55,8 +55,8 @@ export default function App() {
           name="Login"
           component={Login}
           options={{
-            // swipeEnabled: false,
-            // gestureEnabled: false,
+            swipeEnabled: false,
+            gestureEnabled: false,
             drawerIcon: () => (
               <FontAwesomeIcon
                 icon={faUser}

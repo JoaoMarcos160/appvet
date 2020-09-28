@@ -3,7 +3,7 @@ export const messages = {
   sem_conexao_com_internet: "Sem conexão com a internet",
   usuario_nao_encontrado: "Usuário não encotrado",
   senha_incorreta: "Senha incorreta",
-  algo_deu_errado: "Algo deu errado! messages",
+  algo_deu_errado: "Algo deu errado!",
   tempo_excedido: "Tempo de conexão excedido",
   erro: "Ocorreu um erro",
   sem_conexao_BD: "Sem conexão com o Banco de Dados",

@@ -20,9 +20,10 @@ export default function CriarConta({ navigation }) {
   const [senha, setSenha] = useState("");
   const [senhaConfirm, setSenhaConfirm] = useState("");
   const [termosDeUso, setTermosDeUso] = useState(false);
-  useEffect(() => {
-    console.log(termosDeUso);
-  }, [termosDeUso]);
+
+  // useEffect(() => {
+  //   console.log(termosDeUso);
+  // }, [termosDeUso]);
   // useEffect(() => {
   //   console.log(login);
   // }, [login]);
@@ -86,11 +87,13 @@ export default function CriarConta({ navigation }) {
         "Leia atentamente nossos termos de uso do App! 😊"
       );
     } else {
-      console.log("tudo certo");
+      console.log("Requisição para criar usuario feita!");
       const result = await criarUsuario(nome, login, senha, 1, navigation);
       if (!result) {
         inputLogin.current.clear();
         inputLogin.current.focus();
+      } else {
+        navigation.navigate("Home");
       }
     }
   }
@@ -186,6 +189,7 @@ export default function CriarConta({ navigation }) {
               alignContent: "center",
             }}
           >
+            {/* Abaixo seria o checkbox mas tá com warning */}
             <View style={{ marginLeft: getPixelSize(5) }}>
               <CheckBox
                 checkColor={colors.letraNormalClaro}
@@ -202,7 +206,10 @@ export default function CriarConta({ navigation }) {
           <TouchableOpacity style={styles.button} onPress={() => criarUser()}>
             <Text style={styles.textButton}>Criar conta</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <TouchableOpacity
+            style={styles.touchableLogin}
+            onPress={() => navigation.navigate("Login")}
+          >
             <Text style={styles.btnLogin}>
               Já tem uma conta? Faça login aqui
             </Text>
@@ -214,6 +221,9 @@ export default function CriarConta({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  touchableLogin: {
+    marginBottom: 5,
+  },
   btnLogin: {
     color: colors.letraNormalClaro,
     margin: 2,

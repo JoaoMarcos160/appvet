@@ -25,6 +25,7 @@ export async function carregarUsuario() {
 
 async function preencherUsuario(usuario_id) {
   try {
+    // Tem que passi o id do usuario pra a função preencherUsuario() buscar o usuario na api
     await AsyncStorage.clear();
     const response = await api.get("/usuarios/" + usuario_id);
     if (response.data.data.id) {
@@ -35,7 +36,7 @@ async function preencherUsuario(usuario_id) {
       console.log("Registrado!");
     }
   } catch (e) {
-    console.log("deu erro no async");
+    console.log("Deu erro em preencherUsuario");
     if (e.data.data.msg) {
       Alert.alert(e.data.data.msg);
       console.log(e);
@@ -53,64 +54,35 @@ async function preencherToken(token) {
 }
 
 export async function criarUsuario(nome, login, senha, permissao, navigation) {
-  console.log(nome);
+  console.log("Nome: " + nome);
   try {
-    let url = "/Usuarios.php";
-    const response = await api.any({
-      method: "POST",
-      url: "/Usuarios.php",
-      params: { nome: nome, login: login, senha: senha, permissao: permissao },
+    const response = await api.post("/usuarios/", {
+      login: login,
+      senha: senha,
+      nome: nome,
+      permissao: permissao ? permissao : 1,
     });
-    // console.log(response.data);
-    if (typeof response.data.status == "string") {
-      switch (response.data.status) {
-        case "Nome ja existe":
-          Alert.alert(
-            messages.usuario_ja_existe,
-            "Encontramos uma conta com esse nome de usuário, você já tem uma conta?",
-            [
-              {
-                text: "Sim",
-                onPress: () => navigation.navigate("Login"),
-              },
-              {
-                text: "Tentar outro nome de usuário",
-                onPress: () => {
-                  return false;
-                },
-                style: "cancel",
-              },
-            ],
-            {
-              cancelable: false,
-            }
-          );
-          break;
-        case "Sucesso":
-          await preencherStorage({
-            nome: nome,
-            login: login,
-            permissao: permissao,
-          });
-          navigation.navigate("Home");
-          ToastAndroid.showWithGravity(
-            messages.criar_conta_sucesso,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER
-          );
-          break;
-        case "Sem conexao com o BD":
-          Alert.alert(messages.sem_conexao_BD, messages.contato_dev);
-          break;
-        default:
-          console.log(response.data.status);
-          Alert.alert(messages.falha_login, messages.contato_dev);
-          break;
-      }
-      return false;
+    // console.log(response.data.data);
+    if (response.data.data.msg == "Criado com sucesso") {
+      // await preencherStorage(response.data);
+      await AsyncStorage.clear();
+      await preencherUsuario(response.data.data.id);
+      await preencherToken(response.data.data.token);
+      // console.log(AsyncStorage.getItem("@appvet:data_criacao"));
+      ToastAndroid.showWithGravity(
+        messages.criar_conta_sucesso,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+      return true;
     }
-  } catch (error) {
-    console.warn(error);
+    Alert.alert(response.data.data.msg);
+    return false;
+  } catch (response) {
+    console.log("ENTREI NO CATCH");
+    console.log(response.problem);
+    alertsProblemaConexao(response.problem);
+    return false;
   }
 }
 
@@ -140,33 +112,37 @@ export async function validarUsuarios(user, password) {
     return false;
   } catch (response) {
     console.log("ENTREI NO CATCH");
-    switch (response.problem) {
-      case "NETWORK_ERROR":
-        Alert.alert(messages.sem_conexao_com_internet);
-        console.log("sem conexão com a internet", messages.erro);
-        // return messages.sem_conexao_com_internet;
-        break;
-      case "CONNECTION_ERROR":
-        Alert.alert(messages.sem_conexao, messages.erro);
-        console.log("Erro de conexão");
-        // return messages.sem_conexao;
-        break;
-      case "SERVER_ERROR":
-        Alert.alert(messages.sem_conexao, messages.erro);
-        console.log("erro com o servidor");
-        // return messages.sem_conexao;
-        break;
-      case "TIMEOUT_ERROR":
-        Alert.alert(messages.tempo_excedido, messages.erro);
-        console.log("Tempo de conexão excedido");
-        break;
-      // return messages.tempo_excedido;
-      default:
-        Alert.alert(messages.algo_deu_errado, messages.contato_dev);
-        console.log("Erro desconhecido");
-        //vai retornar falso lá embaixo
-        break;
-    }
+    console.log(response.problem);
+    alertsProblemaConexao(response.problem);
     return false;
+  }
+}
+
+async function alertsProblemaConexao(problem) {
+  switch (problem) {
+    case "NETWORK_ERROR":
+      Alert.alert(messages.sem_conexao_com_internet);
+      console.log("sem conexão com a internet", messages.erro);
+      // return messages.sem_conexao_com_internet;
+      break;
+    case "CONNECTION_ERROR":
+      Alert.alert(messages.sem_conexao, messages.erro);
+      console.log("Erro de conexão");
+      // return messages.sem_conexao;
+      break;
+    case "SERVER_ERROR":
+      Alert.alert(messages.sem_conexao, messages.erro);
+      console.log("erro com o servidor");
+      // return messages.sem_conexao;
+      break;
+    case "TIMEOUT_ERROR":
+      Alert.alert(messages.tempo_excedido, messages.erro);
+      console.log("Tempo de conexão excedido");
+      break;
+    // return messages.tempo_excedido;
+    default:
+      Alert.alert(messages.algo_deu_errado, messages.contato_dev);
+      console.log("Erro desconhecido");
+      break;
   }
 }

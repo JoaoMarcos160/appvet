@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { KeyboardAvoidingView, StyleSheet, Text } from "react-native";
+import { Alert, KeyboardAvoidingView, StyleSheet, Text } from "react-native";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import { SafeAreaView } from "react-native-safe-area-context";
-import colors from "../../styles/colors";
+import colors, { sizes } from "../../styles/colors";
 import { carregarUsuario } from "../../utils";
+import BotoesHome from "../../components/BotoesHome";
+import {
+  ScrollView,
+  TouchableHighlight,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
+import {
+  faAirFreshener,
+  faDog,
+  faFan,
+  faIdBadge,
+  faIdCard,
+  faMedkit,
+  faNotesMedical,
+  faPaw,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function Home() {
-  const [user, setUser] = useState(null);
+  const [user] = useState(null);
   const [user_nome, setUser_nome] = useState(null);
 
   useEffect(() => {
     carregarUsuario()
       .then((usuario) => {
-        setUser_nome(usuario.nome);
+        let primeiro_nome = usuario.nome.split(" ")[0];
+        setUser_nome(primeiro_nome);
       })
       .catch((error) => {
         console.warn(error);
@@ -28,25 +45,75 @@ export default function Home() {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView>
         <Header title="Home" />
-
         {user_nome !== null ? (
           <Text style={styles.text}>Bem-vindo(a) {user_nome}</Text>
         ) : (
           <Loading />
         )}
-        {/* <Loading /> */}
+        <ScrollView>
+          <SafeAreaView style={styles.safeAreaBotoes}>
+            <SafeAreaView style={styles.coluna1}>
+              <TouchableOpacity
+                style={styles.touchableBotoes}
+                onPress={() => {
+                  Alert.alert("Cliquei", "texto aleatório");
+                }}
+              >
+                <BotoesHome text="Criar Cliente" icon={faIdCard} />
+              </TouchableOpacity>
+              <BotoesHome text="Criar Animal" icon={faDog} />
+              <BotoesHome text="Criar Consulta" icon={faNotesMedical} />
+            </SafeAreaView>
+            <SafeAreaView style={styles.coluna2}>
+              <BotoesHome text="Ver Clientes" icon={faIdBadge} />
+              <BotoesHome text="Ver Animais" icon={faPaw} />
+              <BotoesHome text="Ver Consultas" icon={faMedkit} />
+            </SafeAreaView>
+          </SafeAreaView>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  touchableBotoes: {
+    borderColor: colors.letraNormalClaro,
+    borderWidth: 3,
+  },
+  coluna1: {
+    marginLeft: "2%",
+    margin: 5,
+    padding: 5,
+    // height: "40%",
+    flex: 1,
+    flexDirection: "column",
+  },
+  coluna2: {
+    marginRight: 5,
+    marginLeft: "2%",
+    margin: 5,
+    padding: 5,
+    // height: "40%",
+    flex: 1,
+    flexDirection: "column",
+  },
+  safeAreaBotoes: {
+    position: "relative",
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: "center",
+    // maxHeight: "50%",
+    maxWidth: "95%",
+    marginHorizontal: 5,
+    padding: 5,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.backgroundPadrao,
   },
   text: {
-    fontSize: 30,
+    fontSize: sizes.letraGrande,
     textAlign: "center",
     color: colors.letraNormalClaro,
     margin: 5,
