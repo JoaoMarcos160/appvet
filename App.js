@@ -1,32 +1,32 @@
 // import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Login from "./src/pages/Login";
 import Home from "./src/pages/Home";
 import Teste from "./src/pages/Teste";
 import Doencas from "./src/pages/Doencas";
 import CriarConta from "./src/pages/CriarConta";
+import CriarCliente from "./src/pages/CriarCliente";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faHouseUser,
-  faAd,
-  faIcons,
   faUser,
-  faFileMedical,
-  faBriefcaseMedical,
   faFileMedicalAlt,
-  faPeopleArrows,
-  faPeopleCarry,
-  faPeace,
   faUsers,
+  faIdCard,
   faUserCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import colors, { sizes } from "./src/styles/colors";
 import { StatusBar } from "expo-status-bar";
+import { NavigationContainer } from "@react-navigation/native";
+import { Text } from "react-native";
 // import { SafeAreaView } from "react-native-safe-area-context";
 
 const Drawer = createDrawerNavigator();
+// const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
@@ -92,13 +92,14 @@ export default function App() {
             ),
           }}
         />
+        {/* <Drawer.Screen name="Criações" component={Criacao} /> */}
         <Drawer.Screen
-          name="Sobre nós"
-          component={Teste}
+          name="Criar Cliente"
+          component={CriarCliente}
           options={{
             drawerIcon: () => (
               <FontAwesomeIcon
-                icon={faUsers}
+                icon={faIdCard}
                 color={colors.letraNormalClaro}
                 size={sizes.iconDrawer}
               />
@@ -109,6 +110,9 @@ export default function App() {
           name="Criar Conta"
           component={CriarConta}
           options={{
+            // title: () => {
+            //   return <Text>C</Text>;
+            // },
             drawerIcon: () => (
               <FontAwesomeIcon
                 icon={faUserCircle}
@@ -118,7 +122,29 @@ export default function App() {
             ),
           }}
         />
+        <Drawer.Screen
+          name="Sobre nós"
+          component={Criacao}
+          options={{
+            drawerIcon: () => (
+              <FontAwesomeIcon
+                icon={faUsers}
+                color={colors.letraNormalClaro}
+                size={sizes.iconDrawer}
+              />
+            ),
+          }}
+        />
       </Drawer.Navigator>
     </NavigationContainer>
+  );
+}
+
+export function Criacao() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Criar Conta" component={CriarConta} />
+      <Tab.Screen name="Criar Cliente" component={CriarCliente} />
+    </Tab.Navigator>
   );
 }

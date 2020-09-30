@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { StyleSheet, Text, View, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import colors, { sizes } from "../../styles/colors";
+import colors, { sizes, stylesPadrao } from "../../styles/colors";
 import Header from "../../components/Header";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import {
@@ -13,6 +13,7 @@ import {
 import { getPixelSize, criarUsuario } from "../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import CheckBox from "../../components/CheckBox";
+import DescricaoInput from "../../components/DescricaoInput";
 
 export default function CriarConta({ navigation }) {
   const [nome, setNome] = useState("");
@@ -99,19 +100,12 @@ export default function CriarConta({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.background}>
+    <SafeAreaView style={stylesPadrao.background}>
       <Header title="Crie sua conta" />
-      <View style={styles.container}>
+      <View style={stylesPadrao.container}>
         <ScrollView>
           <View style={styles.viewInput}>
-            <View style={styles.viewRowIcon}>
-              <FontAwesomeIcon
-                style={styles.icon}
-                icon={faUserCircle}
-                color={colors.letraNormalClaro}
-              />
-              <Text style={styles.text}>Nome: </Text>
-            </View>
+            <DescricaoInput text="Nome: " icon={faUserCircle} />
             <TextInput
               style={styles.textInput}
               placeholder="Digite seu nome aqui"
@@ -123,14 +117,7 @@ export default function CriarConta({ navigation }) {
             />
           </View>
           <View style={styles.viewInput}>
-            <View style={styles.viewRowIcon}>
-              <FontAwesomeIcon
-                style={styles.icon}
-                icon={faUserAlt}
-                color={colors.letraNormalClaro}
-              />
-              <Text style={styles.text}>Login (Nome de Usuário):</Text>
-            </View>
+            <DescricaoInput text="Login (Nome de Usuário):" icon={faUserAlt} />
             <TextInput
               style={styles.textInput}
               placeholder="Digite um nome de usuário aqui"
@@ -143,14 +130,7 @@ export default function CriarConta({ navigation }) {
             />
           </View>
           <View style={styles.viewInput}>
-            <View style={styles.viewRowIcon}>
-              <FontAwesomeIcon
-                style={styles.icon}
-                icon={faLock}
-                color={colors.letraNormalClaro}
-              />
-              <Text style={styles.text}>Senha (mín. 6 caracteres): </Text>
-            </View>
+            <DescricaoInput text="Senha (mín. 6 caracteres):" icon={faLock} />
             <TextInput
               style={styles.textInput}
               placeholder="Digite uma senha"
@@ -163,14 +143,7 @@ export default function CriarConta({ navigation }) {
             />
           </View>
           <View style={styles.viewInput}>
-            <View style={styles.viewRowIcon}>
-              <FontAwesomeIcon
-                style={styles.icon}
-                icon={faLock}
-                color={colors.letraNormalClaro}
-              />
-              <Text style={styles.text}>Confirme a senha: </Text>
-            </View>
+            <DescricaoInput text="Confirme a senha:" icon={faLock} />
             <TextInput
               style={styles.textInput}
               placeholder="Repita sua senha"
@@ -232,18 +205,6 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     // borderColor: "red",
     // borderWidth: 1,
-  },
-  container: {
-    flex: 1,
-    width: "100%",
-    alignItems: "stretch",
-    alignSelf: "center",
-    justifyContent: "space-between",
-  },
-  background: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: colors.backgroundPadrao,
   },
   text: {
     margin: 10,

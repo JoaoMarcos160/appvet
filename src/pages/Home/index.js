@@ -22,7 +22,7 @@ import {
   faPaw,
 } from "@fortawesome/free-solid-svg-icons";
 
-export default function Home() {
+export default function Home({ navigation }) {
   const [user] = useState(null);
   const [user_nome, setUser_nome] = useState(null);
 
@@ -56,18 +56,54 @@ export default function Home() {
               <TouchableOpacity
                 style={styles.touchableBotoes}
                 onPress={() => {
-                  Alert.alert("Cliquei", "texto aleatório");
+                  navigation.navigate("Criar Cliente");
+                  // Alert.alert("Cliquei", "texto aleatório");
                 }}
               >
                 <BotoesHome text="Criar Cliente" icon={faIdCard} />
               </TouchableOpacity>
-              <BotoesHome text="Criar Animal" icon={faDog} />
-              <BotoesHome text="Criar Consulta" icon={faNotesMedical} />
+              <TouchableOpacity
+                style={styles.touchableBotoes}
+                onPress={() => {
+                  Alert.alert("Cliquei", "texto aleatório");
+                }}
+              >
+                <BotoesHome text="Criar Animal" icon={faDog} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.touchableBotoes}
+                onPress={() => {
+                  Alert.alert("Cliquei", "texto aleatório");
+                }}
+              >
+                <BotoesHome text="Criar Consulta" icon={faNotesMedical} />
+              </TouchableOpacity>
             </SafeAreaView>
             <SafeAreaView style={styles.coluna2}>
-              <BotoesHome text="Ver Clientes" icon={faIdBadge} />
-              <BotoesHome text="Ver Animais" icon={faPaw} />
-              <BotoesHome text="Ver Consultas" icon={faMedkit} />
+              <TouchableOpacity
+                style={styles.touchableBotoes}
+                onPress={() => {
+                  Alert.alert("Cliquei", "texto aleatório");
+                }}
+              >
+                <BotoesHome text="Ver Clientes" icon={faIdBadge} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.touchableBotoes}
+                onPress={() => {
+                  Alert.alert("Cliquei", "texto aleatório");
+                }}
+              >
+                <BotoesHome text="Ver Animais" icon={faPaw} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.touchableBotoes}
+                onPress={() => {
+                  Alert.alert("Cliquei", "texto aleatório");
+                }}
+              >
+                <BotoesHome text="Ver Consultas" icon={faMedkit} />
+              </TouchableOpacity>
             </SafeAreaView>
           </SafeAreaView>
         </ScrollView>
@@ -80,6 +116,7 @@ const styles = StyleSheet.create({
   touchableBotoes: {
     borderColor: colors.letraNormalClaro,
     borderWidth: 3,
+    marginVertical: 5,
   },
   coluna1: {
     marginLeft: "2%",
