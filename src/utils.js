@@ -112,7 +112,8 @@ export async function validarUsuarios(user, password) {
     return false;
   } catch (response) {
     console.log("ENTREI NO CATCH");
-    console.log(response.problem);
+    console.log("response: ");
+    console.log(response);
     alertsProblemaConexao(response.problem);
     return false;
   }
@@ -155,3 +156,18 @@ export const cpfMask = (value) => {
     .replace(/(\d{3})(\d{1,2})/, "$1-$2")
     .replace(/(-\d{2})\d+?$/, "$1"); // captura 2 numeros seguidos de um traço e não deixa ser digitado mais nada
 };
+
+export function phoneMask(value) {
+  let tamanho = value.replace(/\D/g, "").length;
+  if (tamanho < 11) {
+    return value
+      .replace(/\D/g, "")
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{4})(\d{1,2})/, "$1-$2");
+  } else {
+    return value
+      .replace(/\D/g, "")
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d{1,2})/, "$1-$2");
+  }
+}
