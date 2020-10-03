@@ -1,6 +1,6 @@
 import { Platform, PixelRatio, Alert, ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
-import api from "./services/api";
+import api, { apiViaCep } from "./services/api";
 import { messages } from "./messages";
 
 export function getPixelSize(pixels) {
@@ -76,6 +76,26 @@ export async function criarUsuario(nome, login, senha, permissao, navigation) {
       );
       return true;
     }
+    if (response.data.data.code == 1020) {
+      Alert.alert(
+        response.data.data.msg,
+        "Deseja tentar voltar e logar com essa conta ou continuar a criação de uma nova conta?",
+        [
+          {
+            text: "Voltar ao login",
+            onPress: () => {
+              navigation.navigate("Login");
+            },
+          },
+          {
+            text: "Continuar",
+            onPress: () => {},
+          },
+        ]
+      );
+      return false;
+    }
+    console.log(response.data.data);
     Alert.alert(response.data.data.msg);
     return false;
   } catch (response) {
@@ -157,6 +177,13 @@ export const cpfMask = (value) => {
     .replace(/(-\d{2})\d+?$/, "$1"); // captura 2 numeros seguidos de um traço e não deixa ser digitado mais nada
 };
 
+export function cepMask(value) {
+  return value
+    .replace(/\D/g, "")
+    .replace(/(\d{2})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})/, "$1-$2");
+}
+
 export function phoneMask(value) {
   let tamanho = value.replace(/\D/g, "").length;
   if (tamanho < 11) {
@@ -169,5 +196,20 @@ export function phoneMask(value) {
       .replace(/\D/g, "")
       .replace(/(\d{2})(\d)/, "($1) $2")
       .replace(/(\d{5})(\d{1,2})/, "$1-$2");
+  }
+}
+
+export async function buscarEndereçoPeloViaCep(cep) {
+  try {
+    let endereco_json = await apiViaCep.get("/" + cep + "/json");
+    // console.log(endereco_json.data);
+    if (endereco_json.data.erro) {
+      return false;
+    }
+    return endereco_json.data;
+  } catch (error) {
+    console.log("Erro na consulta ViaCep");
+    console.log(error);
+    return false;
   }
 }

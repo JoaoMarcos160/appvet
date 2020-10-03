@@ -6,11 +6,13 @@ import colors, { stylesPadrao } from "../../styles/colors";
 export default function DescricaoInput(props) {
   return (
     <View style={stylesPadrao.viewRowIcon}>
-      <FontAwesomeIcon
-        style={stylesPadrao.icon}
-        icon={props.icon}
-        color={colors.letraNormalClaro}
-      />
+      {props.icon && (
+        <FontAwesomeIcon
+          style={stylesPadrao.icon}
+          icon={props.icon}
+          color={colors.letraNormalClaro}
+        />
+      )}
       <Text style={stylesPadrao.text}>{props.text}</Text>
     </View>
   );
