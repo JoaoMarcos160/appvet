@@ -122,15 +122,16 @@ export default function Login({ navigation }) {
 
   return (
     <KeyboardAvoidingView style={styles.background}>
-      <View style={styles.containerLogo}>
-        <Animated.Image
-          style={{
-            width: logo.x,
-            height: logo.y,
-          }}
-          source={icon}
-        />
-      </View>
+      {/* <View style={styles.containerLogo}> */}
+      <Animated.Image
+        style={{
+          marginTop: 15,
+          width: logo.x,
+          height: logo.y,
+        }}
+        source={icon}
+      />
+      {/* </View> */}
 
       <Animated.View
         style={[
@@ -149,7 +150,8 @@ export default function Login({ navigation }) {
           />
           <TextInput
             style={styles.inputs}
-            placeholder="Usuario"
+            placeholder="Usuário"
+            autoCompleteType="username"
             autoCapitalize="none"
             keyboardType="email-address"
             autoCorrect={false}
@@ -157,6 +159,7 @@ export default function Login({ navigation }) {
             onChangeText={(user) => {
               setUser(user);
             }}
+            value={user}
             onSubmitEditing={() => {
               inputPassword.current.focus();
             }}

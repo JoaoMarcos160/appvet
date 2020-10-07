@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
   },
   WrapperCheckBox: {
     flexDirection: "row",
+    flexWrap: "wrap",
     alignItems: "center",
   },
   LabelCheck: {
@@ -55,14 +56,14 @@ const styles = StyleSheet.create({
   },
 });
 
-CheckBox.propTypes = {
-  label: PropTypes.string,
-  labelStyle: PropTypes.object,
-  iconColor: PropTypes.string,
-  onChange: PropTypes.func,
-  showIconInBox: PropTypes.bool,
-  checkColor: PropTypes.string,
-  icon: Icon,
-  sizeIcon: PropTypes.number,
-  iconColor: PropTypes.string,
-};
+// CheckBox.propTypes = {
+//   label: PropTypes.string,
+//   labelStyle: PropTypes.object,
+//   iconColor: PropTypes.string,
+//   onChange: PropTypes.func,
+//   showIconInBox: PropTypes.bool,
+//   checkColor: PropTypes.string,
+//   icon: Icon,
+//   sizeIcon: PropTypes.number,
+//   iconColor: PropTypes.string,
+// };

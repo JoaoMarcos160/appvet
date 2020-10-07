@@ -5,6 +5,7 @@ import {
   faAddressBook,
   faMapMarked,
   faArrowCircleDown,
+  faAddressCard,
 } from "@fortawesome/free-solid-svg-icons";
 import React, { useRef, useState } from "react";
 import {
@@ -19,14 +20,17 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/Header";
-import colors, { stylesPadrao } from "../../styles/colors";
+import colors, { sizes, stylesPadrao } from "../../styles/colors";
 import DescricaoInput from "../../components/DescricaoInput";
 import {
   buscarEndereçoPeloViaCep,
   cepMask,
   cpfMask,
+  dtNascMask,
   getPixelSize,
   phoneMask,
+  validarCPF,
+  validarData,
 } from "../../utils";
 import { apiViaCep } from "../../services/api";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -42,14 +46,21 @@ export default function CriarCliente({}) {
   const [endereco, setEndereco] = useState("");
   const [cidade, setCidade] = useState("");
   const [estado, setEstado] = useState("");
+  const [numero, setNumero] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [bairro, setBairro] = useState("");
   const [dtNasc, setdtNasc] = useState("");
   const [dtNascMascarado, setdtNascMascarado] = useState("");
+  const [btnCriarCliente, setBtnCriarCliente] = useState(false);
 
   const inputNome = useRef(null);
   const inputCpf = useRef(null);
   const inputTelefone = useRef(null);
   const inputCep = useRef(null);
   const inputEndereco = useRef(null);
+  const inputNumero = useRef(null);
+  const inputBairro = useRef(null);
+  const inputComplemento = useRef(null);
   const inputCidade = useRef(null);
   const inputEstado = useRef(null);
   const inputDtNasc = useRef(null);
@@ -109,6 +120,35 @@ export default function CriarCliente({}) {
     }
   }
 
+  async function createClient() {
+    //valida algumas coisas e cria um cliente
+    if ("" == nome) {
+      Alert.alert(
+        "Digite um nome",
+        "As outras informações não são obrigatórias, apenas o nome!"
+      );
+      inputNome.current.focus();
+    } else if (
+      (cpf != "" && cpf.length < 11) ||
+      (cpf.length == 11 && !validarCPF(cpf))
+    ) {
+      Alert.alert(
+        "CPF incorreto ou inválido",
+        "Para cadastro o CPF não é obrigatório, porém o CPF digitado não é válido ou está faltando algum número!"
+      );
+      inputCpf.current.focus();
+    } else if (dtNasc !== "" && !validarData(dtNascMascarado)) {
+      Alert.alert(
+        "Data de nascimento inválida!",
+        "Por favor verifique a data digitada!"
+      );
+      inputDtNasc.current.focus();
+    } else {
+      ToastAndroid.show("Criando...", ToastAndroid.SHORT);
+    }
+    setBtnCriarCliente(false);
+  }
+
   return (
     <SafeAreaView style={stylesPadrao.background}>
       <Header title="Cadastrar cliente" />
@@ -124,18 +164,34 @@ export default function CriarCliente({}) {
             color={colors.letraNormalClaro}
           />
         </View>
+        <View>
+          <Text
+            style={{
+              color: colors.letraNormalClaro,
+              marginLeft: 5,
+              opacity: 0.8,
+              fontSize: sizes.letraMinuscula,
+            }}
+          >
+            *Apenas o nome é obrigatório
+          </Text>
+        </View>
         <ScrollView>
           <View style={stylesPadrao.viewInput}>
-            <DescricaoInput text="Nome: " icon={faUserCircle} />
+            <DescricaoInput text="*Nome: " icon={faUserCircle} />
             <TextInput
               style={stylesPadrao.textInput}
               placeholder="Digite o nome aqui"
-              autoCompleteType="name"
+              autoCompleteType="off"
+              autoCapitalize="words"
               maxLength={255}
               onChangeText={(nome) => {
                 setNome(nome);
               }}
               ref={inputNome}
+              onSubmitEditing={() => {
+                inputCpf.current.focus();
+              }}
             />
           </View>
           <View style={stylesPadrao.viewInput}>
@@ -153,6 +209,9 @@ export default function CriarCliente({}) {
               value={cpfMascarado}
               clearButtonMode="unless-editing"
               ref={inputCpf}
+              onSubmitEditing={() => {
+                inputTelefone.current.focus();
+              }}
             />
           </View>
           <View style={stylesPadrao.viewInput}>
@@ -170,6 +229,9 @@ export default function CriarCliente({}) {
               value={telefoneMascarado}
               clearButtonMode="unless-editing"
               ref={inputTelefone}
+              onSubmitEditing={() => {
+                inputCep.current.focus();
+              }}
             />
             <DescricaoInput text="CEP" icon={faMapMarked} />
             <TextInput
@@ -199,6 +261,7 @@ export default function CriarCliente({}) {
               style={stylesPadrao.textInput}
               placeholder="Endereço aqui"
               autoCompleteType="street-address"
+              autoCapitalize="words"
               keyboardType="ascii-capable"
               maxLength={255}
               onChangeText={(enderecoInput) => {
@@ -208,15 +271,60 @@ export default function CriarCliente({}) {
               clearButtonMode="unless-editing"
               ref={inputEndereco}
             />
+            <DescricaoInput text="Número: " />
+            <TextInput
+              style={stylesPadrao.textInput}
+              placeholder="Número aqui"
+              autoCompleteType="off"
+              keyboardType="visible-password"
+              maxLength={255}
+              onChangeText={(numeroInput) => {
+                setNumero(numeroInput);
+              }}
+              // value={numero}
+              clearButtonMode="unless-editing"
+              ref={inputNumero}
+            />
+            <DescricaoInput text="Complemento: " />
+            <TextInput
+              style={stylesPadrao.textInput}
+              placeholder="Ex.: Apto 23 Bloco 4"
+              autoCompleteType="off"
+              autoCapitalize="sentences"
+              keyboardType="default"
+              maxLength={255}
+              onChangeText={(complementoInput) => {
+                setComplemento(complementoInput);
+              }}
+              // value={numero}
+              clearButtonMode="unless-editing"
+              ref={inputBairro}
+            />
+            <DescricaoInput text="Bairro: " />
+            <TextInput
+              style={stylesPadrao.textInput}
+              placeholder="Bairro aqui"
+              autoCompleteType="off"
+              autoCapitalize="words"
+              keyboardType="default"
+              maxLength={255}
+              onChangeText={(bairroInput) => {
+                setBairro(bairroInput);
+              }}
+              // value={numero}
+              clearButtonMode="unless-editing"
+              ref={inputBairro}
+            />
             <DescricaoInput text="Cidade" />
             <TextInput
               style={stylesPadrao.textInput}
               placeholder="Cidade aqui"
-              autoCompleteType="street-address"
+              autoCompleteType="off"
+              autoCapitalize="words"
               keyboardType="ascii-capable"
               maxLength={255}
-              onChangeText={(enderecoInput) => {
-                setEndereco(enderecoInput);
+              onChangeText={(cidadeInput) => {
+                setCidade(cidadeInput);
               }}
               value={cidade}
               clearButtonMode="unless-editing"
@@ -226,15 +334,32 @@ export default function CriarCliente({}) {
             <TextInput
               style={stylesPadrao.textInput}
               placeholder="Estado aqui"
-              autoCompleteType="street-address"
+              autoCompleteType="off"
+              autoCapitalize="words"
               keyboardType="ascii-capable"
               maxLength={255}
-              onChangeText={(enderecoInput) => {
-                setEndereco(enderecoInput);
+              onChangeText={(estadoInput) => {
+                setEstado(estadoInput);
               }}
               value={estado}
               clearButtonMode="unless-editing"
               ref={inputEstado}
+            />
+            <DescricaoInput text="Data de nascimento" icon={faAddressCard} />
+            <TextInput
+              style={stylesPadrao.textInput}
+              placeholder="dd/mm/aaaa"
+              autoCompleteType="off"
+              keyboardType="decimal-pad"
+              maxLength={10}
+              onChangeText={(dtNascInput) => {
+                setdtNascMascarado(dtNascMask(dtNascInput));
+                setdtNasc(dtNascInput.replace(/\D/g, "-"));
+                // console.log(dtNasc);
+              }}
+              value={dtNascMascarado}
+              clearButtonMode="unless-editing"
+              ref={inputDtNasc}
             />
           </View>
         </ScrollView>
@@ -242,8 +367,11 @@ export default function CriarCliente({}) {
         <TouchableOpacity
           style={stylesPadrao.button}
           onPress={() => {
-            ToastAndroid.show("Criando...", ToastAndroid.SHORT);
+            setBtnCriarCliente(true);
+            createClient();
           }}
+          ref={btnSalvar}
+          disabled={btnCriarCliente}
         >
           <Text style={stylesPadrao.textButton}>Criar cliente</Text>
         </TouchableOpacity>

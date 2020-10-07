@@ -23,6 +23,7 @@ export const sizes = {
   letraNormal: getPixelSize(7),
   letraGrande: getPixelSize(10),
   letraPequena: getPixelSize(6),
+  letraMinuscula: getPixelSize(4),
   letraInputs: getPixelSize(6),
 };
 
