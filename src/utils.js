@@ -26,20 +26,20 @@ export async function carregarUsuario() {
 async function preencherUsuario(usuario_id) {
   try {
     // Tem que passi o id do usuario pra a função preencherUsuario() buscar o usuario na api
-    await AsyncStorage.clear();
+    await AsyncStorage.removeItem("@appvet:usuario");
     const response = await api.get("/usuarios/" + usuario_id);
     if (response.data.data.id) {
       await AsyncStorage.setItem(
         "@appvet:usuario",
         JSON.stringify(response.data.data)
       );
-      console.log("Registrado!");
+      console.log("Usuario registrado!");
     }
   } catch (e) {
     console.log("Deu erro em preencherUsuario");
     if (e.data.data.msg) {
       Alert.alert(e.data.data.msg);
-      console.log(e);
+      console.warn(e);
     }
   }
 }
@@ -47,9 +47,9 @@ async function preencherUsuario(usuario_id) {
 async function preencherToken(token) {
   try {
     await AsyncStorage.setItem("@appvet:token", token);
-    console.log("Token registrado!");
+    console.log("Token " + token + " registrado!");
   } catch (e) {
-    console.log(e);
+    console.warn(e);
   }
 }
 
@@ -64,11 +64,10 @@ export async function criarUsuario(nome, login, senha, permissao, navigation) {
     });
     // console.log(response.data.data);
     if (response.data.data.msg == "Criado com sucesso") {
-      // await preencherStorage(response.data);
       await AsyncStorage.clear();
+      // await AsyncStorage.multiRemove(["@appvet:token", "@appvet:usuario"]);
       await preencherUsuario(response.data.data.id);
       await preencherToken(response.data.data.token);
-      // console.log(AsyncStorage.getItem("@appvet:data_criacao"));
       ToastAndroid.showWithGravity(
         messages.criar_conta_sucesso,
         ToastAndroid.SHORT,
@@ -106,6 +105,57 @@ export async function criarUsuario(nome, login, senha, permissao, navigation) {
   }
 }
 
+export async function criarCliente(
+  nome,
+  cpf,
+  telefone,
+  cep,
+  endereco,
+  numero,
+  bairro,
+  complemento,
+  cidade,
+  estado,
+  dtNasc
+) {
+  try {
+    const token = await AsyncStorage.getItem("@appvet:token");
+    const usuario = await carregarUsuario();
+    var dia = data.split("-")[0];
+    var mes = data.split("-")[1];
+    var ano = data.split("-")[2];
+    const dtConvertida =
+      ano + "-" + ("0" + mes).slice(-2) + "-" + ("0" + dia).slice(-2);
+    const response = await api.post("/clientes/", {
+      token: token,
+      usuario_id: usuario.id,
+      nome: nome,
+      cpf: cpf,
+      telefone: telefone,
+      cep: cep,
+      endereco: endereco,
+      numero: numero,
+      bairro: bairro,
+      complemento: complemento,
+      cidade: cidade,
+      estado: estado,
+      dt_nasc: dtConvertida,
+    });
+    Alert.alert(response.ok, response.data);
+    // Alert.alert(response.data.data.msg);
+    return true;
+  } catch (response) {
+    console.log(response.data.data);
+    if (response.data.data.msg) {
+      Alert.alert(response.data.data.msg);
+    } else {
+      // console.log(response.problem);
+      alertsProblemaConexao(response.problem);
+    }
+    return false;
+  }
+}
+
 export async function validarUsuarios(user, password) {
   // console.log("User: " + user);
   // console.log("Password: " + password);
@@ -116,8 +166,8 @@ export async function validarUsuarios(user, password) {
     });
     // console.log(response.data.data);
     if (response.data.data.msg == "Sucesso") {
-      // await preencherStorage(response.data);
-      await AsyncStorage.clear();
+      console.log("Logado com sucesso");
+      // await AsyncStorage.clear();
       await preencherToken(response.data.data.token);
       await preencherUsuario(response.data.data.id);
       // console.log(AsyncStorage.getItem("@appvet:data_criacao"));

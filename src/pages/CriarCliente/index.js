@@ -16,6 +16,8 @@ import {
   View,
   TouchableOpacity,
   ToastAndroid,
+  Platform,
+  ProgressBarAndroid,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -26,14 +28,17 @@ import {
   buscarEndereçoPeloViaCep,
   cepMask,
   cpfMask,
+  criarCliente,
   dtNascMask,
   getPixelSize,
   phoneMask,
   validarCPF,
   validarData,
 } from "../../utils";
-import { apiViaCep } from "../../services/api";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import AsyncStorage from "@react-native-community/async-storage";
+import Loading from "../../components/Loading";
+import { ProgressBar } from "@react-native-community/progress-bar-android";
 
 export default function CriarCliente({}) {
   const [nome, setNome] = useState("");
@@ -43,6 +48,7 @@ export default function CriarCliente({}) {
   const [telefoneMascarado, setTelefoneMascarado] = useState("");
   const [cep, setCep] = useState("");
   const [cepMascarado, setCepMascarado] = useState("");
+  const [loadingCep, setLoadingCep] = useState(false);
   const [endereco, setEndereco] = useState("");
   const [cidade, setCidade] = useState("");
   const [estado, setEstado] = useState("");
@@ -69,11 +75,34 @@ export default function CriarCliente({}) {
 
   async function buscarEndereco(cep) {
     if (cep == "") {
-      Alert.alert(
-        "Nenhum cep digitado!",
-        "Digitando um cep o app buscará algum endereço correspondente ao cep indicado!"
-      );
-      inputCep.current.focus();
+      let perguntaCep = await AsyncStorage.getItem("@appvet:perguntarCep");
+      if (perguntaCep == "nao") {
+        return;
+      } else if (cep == "") {
+        Alert.alert(
+          "Nenhum cep digitado!",
+          "Digitando um cep o app buscará algum endereço correspondente ao cep indicado!",
+          [
+            {
+              text: "Não perguntar novamente",
+              onPress: () => {
+                AsyncStorage.setItem("@appvet:perguntarCep", "nao");
+              },
+              style: "destructive",
+            },
+            {
+              text: "Ok",
+              onPress: () => {
+                inputCep.current.focus();
+              },
+              style: "default",
+            },
+          ],
+          {
+            cancelable: false,
+          }
+        );
+      }
     } else if (cep.length < 8) {
       Alert.alert(
         "Falta algum número no cep!",
@@ -95,10 +124,18 @@ export default function CriarCliente({}) {
         ]
       );
     } else {
+      setLoadingCep(true);
       const endereco_retornado = await buscarEndereçoPeloViaCep(cep);
+      setLoadingCep(false);
       if (endereco_retornado) {
         if (endereco_retornado.logradouro) {
           setEndereco(endereco_retornado.logradouro);
+        }
+        if (endereco_retornado.complemento) {
+          setComplemento(endereco_retornado.complemento);
+        }
+        if (endereco_retornado.bairro) {
+          setBairro(endereco_retornado.bairro);
         }
         if (endereco_retornado.localidade) {
           setCidade(endereco_retornado.localidade);
@@ -109,9 +146,6 @@ export default function CriarCliente({}) {
         if (telefoneMascarado == "" && endereco_retornado.ddd) {
           setTelefoneMascarado(endereco_retornado.ddd);
         }
-        // if(endereco_retornado.bairro){
-        //   setEndereco(endereco_retornado.logradouro);
-        // }
         return;
       }
       Alert.alert("Nenhum cep encontrado!", "Confira o cep e tente novamente!");
@@ -122,6 +156,7 @@ export default function CriarCliente({}) {
 
   async function createClient() {
     //valida algumas coisas e cria um cliente
+    setBtnCriarCliente(true);
     if ("" == nome) {
       Alert.alert(
         "Digite um nome",
@@ -144,7 +179,24 @@ export default function CriarCliente({}) {
       );
       inputDtNasc.current.focus();
     } else {
-      ToastAndroid.show("Criando...", ToastAndroid.SHORT);
+      let result = await criarCliente(
+        nome,
+        cpf,
+        telefone,
+        cep,
+        endereco,
+        numero,
+        bairro,
+        complemento,
+        cidade,
+        estado,
+        dtNasc
+      );
+      if (result) {
+        ToastAndroid.show("Criado com sucesso", ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show("Não foi possível criar", ToastAndroid.SHORT);
+      }
     }
     setBtnCriarCliente(false);
   }
@@ -250,12 +302,21 @@ export default function CriarCliente({}) {
                 buscarEndereco(cep);
               }}
               onSubmitEditing={() => {
-                buscarEndereco(cep);
+                inputEndereco.current.focus();
               }}
               value={cepMascarado}
               clearButtonMode="unless-editing"
               ref={inputCep}
             />
+            {loadingCep &&
+              (Platform.OS == "ios" ? (
+                <Loading styleView={styles.loadingCepView} />
+              ) : (
+                <ProgressBarAndroid
+                  styleAttr="Horizontal"
+                  color={colors.letraNormalClaro}
+                />
+              ))}
             <DescricaoInput text="Endereço: " icon={faAddressBook} />
             <TextInput
               style={stylesPadrao.textInput}
@@ -267,6 +328,10 @@ export default function CriarCliente({}) {
               onChangeText={(enderecoInput) => {
                 setEndereco(enderecoInput);
               }}
+              onSubmitEditing={() => {
+                inputNumero.current.focus();
+              }}
+              editable={!loadingCep}
               value={endereco}
               clearButtonMode="unless-editing"
               ref={inputEndereco}
@@ -281,7 +346,11 @@ export default function CriarCliente({}) {
               onChangeText={(numeroInput) => {
                 setNumero(numeroInput);
               }}
-              // value={numero}
+              onSubmitEditing={() => {
+                inputComplemento.current.focus();
+              }}
+              editable={!loadingCep}
+              value={numero}
               clearButtonMode="unless-editing"
               ref={inputNumero}
             />
@@ -296,9 +365,13 @@ export default function CriarCliente({}) {
               onChangeText={(complementoInput) => {
                 setComplemento(complementoInput);
               }}
-              // value={numero}
+              onSubmitEditing={() => {
+                inputBairro.current.focus();
+              }}
+              editable={!loadingCep}
+              value={complemento}
               clearButtonMode="unless-editing"
-              ref={inputBairro}
+              ref={inputComplemento}
             />
             <DescricaoInput text="Bairro: " />
             <TextInput
@@ -311,7 +384,11 @@ export default function CriarCliente({}) {
               onChangeText={(bairroInput) => {
                 setBairro(bairroInput);
               }}
-              // value={numero}
+              onSubmitEditing={() => {
+                inputCidade.current.focus();
+              }}
+              editable={!loadingCep}
+              value={bairro}
               clearButtonMode="unless-editing"
               ref={inputBairro}
             />
@@ -326,6 +403,10 @@ export default function CriarCliente({}) {
               onChangeText={(cidadeInput) => {
                 setCidade(cidadeInput);
               }}
+              onSubmitEditing={() => {
+                inputEstado.current.focus();
+              }}
+              editable={!loadingCep}
               value={cidade}
               clearButtonMode="unless-editing"
               ref={inputCidade}
@@ -341,6 +422,10 @@ export default function CriarCliente({}) {
               onChangeText={(estadoInput) => {
                 setEstado(estadoInput);
               }}
+              onSubmitEditing={() => {
+                inputDtNasc.current.focus();
+              }}
+              editable={!loadingCep}
               value={estado}
               clearButtonMode="unless-editing"
               ref={inputEstado}
@@ -355,7 +440,9 @@ export default function CriarCliente({}) {
               onChangeText={(dtNascInput) => {
                 setdtNascMascarado(dtNascMask(dtNascInput));
                 setdtNasc(dtNascInput.replace(/\D/g, "-"));
-                // console.log(dtNasc);
+              }}
+              onSubmitEditing={() => {
+                createClient();
               }}
               value={dtNascMascarado}
               clearButtonMode="unless-editing"
@@ -367,7 +454,6 @@ export default function CriarCliente({}) {
         <TouchableOpacity
           style={stylesPadrao.button}
           onPress={() => {
-            setBtnCriarCliente(true);
             createClient();
           }}
           ref={btnSalvar}
@@ -379,3 +465,10 @@ export default function CriarCliente({}) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingCepView: {
+    flexWrap: "wrap",
+    margin: 0,
+  },
+});

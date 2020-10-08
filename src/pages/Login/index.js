@@ -209,7 +209,11 @@ export default function Login({ navigation }) {
         </TouchableOpacity>
       </Animated.View>
       {btnAcessarDisable &&
-        (Platform.OS == "android" ? <ProgressBarAndroid /> : <Loading />)}
+        (Platform.OS == "android" ? (
+          <ProgressBarAndroid color={colors.letraNormalClaro} />
+        ) : (
+          <Loading />
+        ))}
     </KeyboardAvoidingView>
   );
 }

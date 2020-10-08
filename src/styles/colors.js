@@ -88,7 +88,7 @@ export const stylesPadrao = {
     // borderWidth: 1,
   },
   button: {
-    margin: 20,
+    margin: 5,
     width: "auto",
     height: 40,
     borderColor: colors.titulos,

@@ -2,13 +2,13 @@ import React from "react";
 import { StyleSheet, SafeAreaView, ActivityIndicator } from "react-native";
 import colors from "../../styles/colors";
 
-export default function Loading() {
+export default function Loading(props) {
   return (
-    <SafeAreaView style={styles.teste}>
+    <SafeAreaView style={props.styleView ? props.styleView : styles.teste}>
       <ActivityIndicator
-        style={styles.loading}
-        size="large"
-        color={colors.letraNormalClaro}
+        style={props.style ? props.style : styles.loading}
+        size={props.size ? props.size : "large"}
+        color={props.color ? props.color : colors.letraNormalClaro}
         animating={true}
       />
     </SafeAreaView>
