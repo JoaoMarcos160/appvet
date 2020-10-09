@@ -57,6 +57,8 @@ export default function CriarCliente({}) {
   const [bairro, setBairro] = useState("");
   const [dtNasc, setdtNasc] = useState("");
   const [dtNascMascarado, setdtNascMascarado] = useState("");
+  const [email, setEmail] = useState("");
+  const [observacao, setObservacao] = useState("");
   const [btnCriarCliente, setBtnCriarCliente] = useState(false);
 
   const inputNome = useRef(null);
@@ -70,6 +72,8 @@ export default function CriarCliente({}) {
   const inputCidade = useRef(null);
   const inputEstado = useRef(null);
   const inputDtNasc = useRef(null);
+  const inputEmail = useRef(null);
+  const inputObservacao = useRef(null);
   const btnSalvar = useRef(null);
   //falta por bairro na Api-APPVEt
 
@@ -190,9 +194,24 @@ export default function CriarCliente({}) {
         complemento,
         cidade,
         estado,
-        dtNasc
+        dtNasc,
+        email,
+        observacao
       );
       if (result) {
+        inputNome.current.clear();
+        inputCpf.current.clear();
+        inputTelefone.current.clear();
+        inputCep.current.clear();
+        inputEndereco.current.clear();
+        inputNumero.current.clear();
+        inputBairro.current.clear();
+        inputComplemento.current.clear();
+        inputCidade.current.clear();
+        inputEstado.current.clear();
+        inputDtNasc.current.clear();
+        inputEmail.current.clear();
+        inputObservacao.current.clear();
         ToastAndroid.show("Criado com sucesso", ToastAndroid.SHORT);
       } else {
         ToastAndroid.show("Não foi possível criar", ToastAndroid.SHORT);
@@ -317,6 +336,11 @@ export default function CriarCliente({}) {
                   color={colors.letraNormalClaro}
                 />
               ))}
+            {loadingCep && (
+              <Text style={styles.textBuscandoEndereco}>
+                Buscando endereço pelo CEP, aguarde...
+              </Text>
+            )}
             <DescricaoInput text="Endereço: " icon={faAddressBook} />
             <TextInput
               style={stylesPadrao.textInput}
@@ -430,7 +454,7 @@ export default function CriarCliente({}) {
               clearButtonMode="unless-editing"
               ref={inputEstado}
             />
-            <DescricaoInput text="Data de nascimento" icon={faAddressCard} />
+            <DescricaoInput text="Data de nascimento:" icon={faAddressCard} />
             <TextInput
               style={stylesPadrao.textInput}
               placeholder="dd/mm/aaaa"
@@ -442,11 +466,49 @@ export default function CriarCliente({}) {
                 setdtNasc(dtNascInput.replace(/\D/g, "-"));
               }}
               onSubmitEditing={() => {
-                createClient();
+                inputEmail.current.focus();
               }}
               value={dtNascMascarado}
               clearButtonMode="unless-editing"
               ref={inputDtNasc}
+            />
+            <DescricaoInput text="Email:" />
+            <TextInput
+              style={stylesPadrao.textInput}
+              placeholder="Email aqui"
+              autoCompleteType="off"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              maxLength={100}
+              onChangeText={(emailInput) => {
+                setEmail(emailInput);
+              }}
+              onSubmitEditing={() => {
+                inputObservacao.current.focus();
+              }}
+              value={email}
+              clearButtonMode="unless-editing"
+              ref={inputEmail}
+            />
+            <DescricaoInput text="Observações:" />
+            <TextInput
+              style={stylesPadrao.multiLineTextInput}
+              placeholder="Coloque aqui suas observações"
+              autoCompleteType="off"
+              autoCapitalize="sentences"
+              keyboardType="default"
+              // maxLength={5000}
+              onChangeText={(observacaoInput) => {
+                setObservacao(observacaoInput);
+              }}
+              onSubmitEditing={() => {
+                createClient();
+              }}
+              multiline={true}
+              numberOfLines={8}
+              value={observacao}
+              clearButtonMode="unless-editing"
+              ref={inputObservacao}
             />
           </View>
         </ScrollView>
@@ -470,5 +532,12 @@ const styles = StyleSheet.create({
   loadingCepView: {
     flexWrap: "wrap",
     margin: 0,
+  },
+  textBuscandoEndereco: {
+    color: colors.letraNormalClaro,
+    fontSize: sizes.letraPequena,
+    textAlign: "center",
+    borderBottomColor: colors.letraNormalClaro,
+    borderBottomWidth: 2,
   },
 });

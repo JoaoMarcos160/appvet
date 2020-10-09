@@ -2,6 +2,7 @@ import { Platform, PixelRatio, Alert, ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import api, { apiViaCep } from "./services/api";
 import { messages } from "./messages";
+import { or } from "react-native-reanimated";
 
 export function getPixelSize(pixels) {
   //pra pegar o tamanho dos pixels e não dar diferença na densidade de pixels em telas maiores ou menores
@@ -99,7 +100,7 @@ export async function criarUsuario(nome, login, senha, permissao, navigation) {
     return false;
   } catch (response) {
     console.log("ENTREI NO CATCH");
-    console.log(response.problem);
+    console.warn(response);
     alertsProblemaConexao(response.problem);
     return false;
   }
@@ -116,16 +117,21 @@ export async function criarCliente(
   complemento,
   cidade,
   estado,
-  dtNasc
+  dtNasc,
+  email,
+  observacao
 ) {
   try {
     const token = await AsyncStorage.getItem("@appvet:token");
     const usuario = await carregarUsuario();
-    var dia = data.split("-")[0];
-    var mes = data.split("-")[1];
-    var ano = data.split("-")[2];
-    const dtConvertida =
-      ano + "-" + ("0" + mes).slice(-2) + "-" + ("0" + dia).slice(-2);
+    var dtConvertida = null;
+    if (dtNasc != undefined && dtNasc != null && dtNasc != "") {
+      var dia = dtNasc.split("-")[0];
+      var mes = dtNasc.split("-")[1];
+      var ano = dtNasc.split("-")[2];
+      dtConvertida =
+        ano + "-" + ("0" + mes).slice(-2) + "-" + ("0" + dia).slice(-2);
+    }
     const response = await api.post("/clientes/", {
       token: token,
       usuario_id: usuario.id,
@@ -140,15 +146,16 @@ export async function criarCliente(
       cidade: cidade,
       estado: estado,
       dt_nasc: dtConvertida,
+      email: email,
+      observacao: observacao,
     });
-    Alert.alert(response.ok, response.data);
-    // Alert.alert(response.data.data.msg);
+    console.log(response.data.data);
     return true;
   } catch (response) {
-    console.log(response.data.data);
+    console.warn(response);
     if (response.data.data.msg) {
-      Alert.alert(response.data.data.msg);
-    } else {
+      Alert.alert(response.problem,response.data.data.msg);
+    } else if (response.problem) {
       // console.log(response.problem);
       alertsProblemaConexao(response.problem);
     }
