@@ -6,6 +6,7 @@ import Teste from "./src/pages/Teste";
 import Doencas from "./src/pages/Doencas";
 import CriarConta from "./src/pages/CriarConta";
 import CriarCliente from "./src/pages/CriarCliente";
+import CriarAnimal from "./src/pages/CriarAnimal";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -17,6 +18,7 @@ import {
   faUsers,
   faIdCard,
   faUserCircle,
+  faDog,
 } from "@fortawesome/free-solid-svg-icons";
 import colors, { sizes } from "./src/styles/colors";
 import { StatusBar } from "expo-status-bar";
@@ -107,12 +109,24 @@ export default function App() {
           }}
         />
         <Drawer.Screen
+          name="Criar Animal"
+          component={CriarAnimal}
+          options={{
+            drawerIcon: () => (
+              <FontAwesomeIcon
+                icon={faDog}
+                color={colors.letraNormalClaro}
+                size={sizes.iconDrawer}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
           name="Criar Conta"
           component={CriarConta}
           options={{
-            // title: () => {
-            //   return <Text>C</Text>;
-            // },
+            swipeEnabled: false,
+            gestureEnabled: false,
             drawerIcon: () => (
               <FontAwesomeIcon
                 icon={faUserCircle}

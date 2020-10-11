@@ -30,7 +30,6 @@ import {
   cpfMask,
   criarCliente,
   dtNascMask,
-  getPixelSize,
   phoneMask,
   validarCPF,
   validarData,
@@ -38,9 +37,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import AsyncStorage from "@react-native-community/async-storage";
 import Loading from "../../components/Loading";
-import { ProgressBar } from "@react-native-community/progress-bar-android";
 
-export default function CriarCliente({}) {
+export default function CriarCliente({ navigation }) {
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
   const [cpfMascarado, setCpfMascarado] = useState("");
@@ -199,6 +197,7 @@ export default function CriarCliente({}) {
         observacao
       );
       if (result) {
+        //Limpando todos os campos
         inputNome.current.clear();
         inputCpf.current.clear();
         inputTelefone.current.clear();
@@ -212,9 +211,51 @@ export default function CriarCliente({}) {
         inputDtNasc.current.clear();
         inputEmail.current.clear();
         inputObservacao.current.clear();
-        ToastAndroid.show("Criado com sucesso", ToastAndroid.SHORT);
+        //Sai do foco de todos os campos
+        inputNome.current.blur();
+        inputCpf.current.blur();
+        inputTelefone.current.blur();
+        inputCep.current.blur();
+        inputEndereco.current.blur();
+        inputNumero.current.blur();
+        inputBairro.current.blur();
+        inputComplemento.current.blur();
+        inputCidade.current.blur();
+        inputEstado.current.blur();
+        inputDtNasc.current.blur();
+        inputEmail.current.blur();
+        inputObservacao.current.blur();
+        //Seta todos os estados para seu estado inicial
+        setNome("");
+        setCpf("");
+        setCpfMascarado("");
+        setTelefone("");
+        setTelefoneMascarado("");
+        setCep("");
+        setCepMascarado("");
+        setLoadingCep(false);
+        setEndereco("");
+        setCidade("");
+        setEstado("");
+        setNumero("");
+        setComplemento("");
+        setBairro("");
+        setdtNasc("");
+        setdtNascMascarado("");
+        setEmail("");
+        setObservacao("");
+        ToastAndroid.showWithGravity(
+          "Criado com sucesso",
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+        navigation.navigate("Home");
       } else {
-        ToastAndroid.show("Não foi possível criar", ToastAndroid.SHORT);
+        ToastAndroid.showWithGravity(
+          "Não foi possível criar",
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER
+        );
       }
     }
     setBtnCriarCliente(false);

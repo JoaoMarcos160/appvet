@@ -16,7 +16,7 @@ export async function carregarUsuario() {
   try {
     const user = await AsyncStorage.getItem("@appvet:usuario");
     const userJson = JSON.parse(user);
-    console.log(userJson);
+    // console.log(userJson);
     return userJson;
   } catch (error) {
     console.warn(error);
@@ -154,7 +154,7 @@ export async function criarCliente(
   } catch (response) {
     console.warn(response);
     if (response.data.data.msg) {
-      Alert.alert(response.problem,response.data.data.msg);
+      Alert.alert(response.problem, response.data.data.msg);
     } else if (response.problem) {
       // console.log(response.problem);
       alertsProblemaConexao(response.problem);

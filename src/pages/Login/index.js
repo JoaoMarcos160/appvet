@@ -11,13 +11,14 @@ import {
   Alert,
   ProgressBarAndroid,
   Platform,
+  SafeAreaView,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faAddressCard, faLock } from "@fortawesome/free-solid-svg-icons";
 import colors from "../../styles/colors";
 import icon from "../../../assets/icon.png";
 import Loading from "../../components/Loading";
-import { validarUsuarios } from "../../utils";
+import { getPixelSize, validarUsuarios } from "../../utils";
 
 export default function Login({ navigation }) {
   const tamanhoLogo = {
@@ -38,7 +39,10 @@ export default function Login({ navigation }) {
   const [offset] = useState(new Animated.ValueXY({ x: 0, y: 100 }));
   const [opacity] = useState(new Animated.Value(0));
   const [logo] = useState(
-    new Animated.ValueXY({ x: tamanhoLogo.x, y: tamanhoLogo.y })
+    new Animated.ValueXY({
+      x: tamanhoLogo.x,
+      y: tamanhoLogo.y,
+    })
   );
   const useNativeDriver = false;
 
@@ -93,12 +97,12 @@ export default function Login({ navigation }) {
   function keyboardDidShow() {
     Animated.parallel([
       Animated.timing(logo.x, {
-        toValue: 55,
+        toValue: 0,
         duration: 100,
         useNativeDriver: useNativeDriver,
       }),
       Animated.timing(logo.y, {
-        toValue: 55,
+        toValue: 0,
         duration: 100,
         useNativeDriver: useNativeDriver,
       }),
@@ -142,7 +146,7 @@ export default function Login({ navigation }) {
           },
         ]}
       >
-        <View style={styles.viewInput}>
+        <View style={{ ...styles.viewInput, marginTop: 60 }}>
           <FontAwesomeIcon
             icon={faAddressCard}
             color={colors.letraNormalClaro}
@@ -198,15 +202,32 @@ export default function Login({ navigation }) {
         >
           <Text style={styles.submitText}>Acessar</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.btnRegister}
-          onPress={() => {
-            navigation.navigate("Criar Conta");
-          }}
-        >
-          <Text style={styles.registerText}>Criar conta</Text>
-        </TouchableOpacity>
+        <View style={styles.lineButtons}>
+          <TouchableOpacity
+            style={styles.btnRegister}
+            onPress={() => {
+              navigation.navigate("Criar Conta");
+            }}
+          >
+            <Text style={styles.registerText}>Criar conta</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btnRegister}
+            onPress={() => {
+              navigation.navigate("Criar Conta");
+            }}
+          >
+            <Text
+              style={{
+                ...styles.registerText,
+                fontStyle: "italic",
+                textDecorationLine: "underline",
+              }}
+            >
+              Esqueci minha senha
+            </Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
       {btnAcessarDisable &&
         (Platform.OS == "android" ? (
@@ -218,6 +239,9 @@ export default function Login({ navigation }) {
   );
 }
 const styles = StyleSheet.create({
+  lineButtons: {
+    alignItems: "center",
+  },
   iconStyle: {
     margin: 5,
     padding: 10,
@@ -241,6 +265,7 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
+    paddingTop: getPixelSize(6),
     alignItems: "center",
     backgroundColor: colors.backgroundLogin,
   },

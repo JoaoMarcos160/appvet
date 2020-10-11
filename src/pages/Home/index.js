@@ -6,21 +6,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import colors, { sizes } from "../../styles/colors";
 import { carregarUsuario } from "../../utils";
 import BotoesHome from "../../components/BotoesHome";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import {
-  ScrollView,
-  TouchableHighlight,
-  TouchableOpacity,
-} from "react-native-gesture-handler";
-import {
-  faAirFreshener,
   faDog,
-  faFan,
   faIdBadge,
   faIdCard,
   faMedkit,
   faNotesMedical,
   faPaw,
 } from "@fortawesome/free-solid-svg-icons";
+import { AdMobBanner, setTestDeviceIDAsync } from "expo-ads-admob";
 
 export default function Home({ navigation }) {
   const [user] = useState(null);
@@ -31,6 +26,7 @@ export default function Home({ navigation }) {
       .then((usuario) => {
         let primeiro_nome = usuario.nome.split(" ")[0];
         setUser_nome(primeiro_nome);
+        setTestDeviceIDAsync("EMULATOR");
       })
       .catch((error) => {
         console.warn(error);
@@ -44,13 +40,14 @@ export default function Home({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView>
-        <Header title="Home" />
-        {user_nome !== null ? (
-          <Text style={styles.text}>Bem-vindo(a) {user_nome}</Text>
-        ) : (
-          <Loading />
-        )}
         <ScrollView>
+          <Header title="Home" />
+          {user_nome !== null ? (
+            <Text style={styles.text}>Bem-vindo(a) {user_nome}</Text>
+          ) : (
+            <Loading />
+          )}
+
           <SafeAreaView style={styles.safeAreaBotoes}>
             <SafeAreaView style={styles.coluna1}>
               <TouchableOpacity
@@ -65,7 +62,7 @@ export default function Home({ navigation }) {
               <TouchableOpacity
                 style={styles.touchableBotoes}
                 onPress={() => {
-                  Alert.alert("Cliquei", "texto aleatório");
+                  navigation.navigate("Criar Animal");
                 }}
               >
                 <BotoesHome text="Criar Animal" icon={faDog} />
@@ -104,9 +101,37 @@ export default function Home({ navigation }) {
               >
                 <BotoesHome text="Ver Consultas" icon={faMedkit} />
               </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.touchableBotoes}
+                onPress={() => {
+                  Alert.alert("Cliquei", "texto aleatório");
+                }}
+              >
+                <BotoesHome text="Ver Consultas" icon={faMedkit} />
+              </TouchableOpacity>
             </SafeAreaView>
           </SafeAreaView>
+          <AdMobBanner
+            bannerSize="fullBanner"
+            adUnitID="ca-app-pub-3940256099942544/6300978111"
+            // adUnitID="ca-app-pub-1947127811333876/7886829387"
+            servePersonalizedAds={true}
+            onDidFailToReceiveAdWithError={(text) => {
+              console.log("Erro ao carregar anúncio: ");
+              console.log(text);
+            }}
+            style={{ borderColor: colors.letraNormalClaro, borderWidth: 2 }}
+          />
         </ScrollView>
+        {/* <AdMobBanner
+        bannerSize="fullBanner"
+        adUnitID="ca-app-pub-1947127811333876/7886829387" // Test ID, Replace with your-admob-unit-id
+        servePersonalizedAds // true or false
+        onDidFailToReceiveAdWithError={(text) => {
+          console.log("Erro ao carregar anúncio: ");
+          console.log(text);
+        }}
+      /> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -143,7 +168,7 @@ const styles = StyleSheet.create({
     // maxHeight: "50%",
     maxWidth: "95%",
     marginHorizontal: 5,
-    padding: 5,
+    padding: 2,
   },
   container: {
     flex: 1,
