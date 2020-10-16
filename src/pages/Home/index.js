@@ -1,21 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { Alert, KeyboardAvoidingView, StyleSheet, Text } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import { SafeAreaView } from "react-native-safe-area-context";
 import colors, { sizes } from "../../styles/colors";
-import { carregarUsuario } from "../../utils";
+import { carregarUsuario, getPixelSize } from "../../utils";
 import BotoesHome from "../../components/BotoesHome";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import {
+  faBars,
   faDog,
+  faHamburger,
   faIdBadge,
   faIdCard,
   faMedkit,
   faNotesMedical,
   faPaw,
+  faSearchMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { AdMobBanner, setTestDeviceIDAsync } from "expo-ads-admob";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 export default function Home({ navigation }) {
   const [user] = useState(null);
@@ -40,8 +51,45 @@ export default function Home({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView>
-        <ScrollView>
+        <View
+          style={{
+            flexDirection: "row",
+            borderColor: colors.letraNormalClaro,
+            borderBottomWidth: 1,
+            backgroundColor: "#000",
+            opacity: 0.9,
+            // borderRadius: 8,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              flex: 0,
+              margin: 12,
+              padding: 8,
+              borderColor: colors.letraNormalClaro,
+              borderWidth: 1,
+              borderRadius: 5,
+              alignContent: "space-between",
+            }}
+            onPress={() => {
+              navigation.openDrawer();
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faBars}
+              color={colors.letraNormalClaro}
+              size={getPixelSize(10)}
+            />
+          </TouchableOpacity>
           <Header title="Home" />
+        </View>
+        <ScrollView
+          style={{
+            marginBottom: 75,
+          }}
+          showsVerticalScrollIndicator={true}
+          alwaysBounceVertical={true}
+        >
           {user_nome !== null ? (
             <Text style={styles.text}>Bem-vindo(a) {user_nome}</Text>
           ) : (
@@ -112,26 +160,19 @@ export default function Home({ navigation }) {
             </SafeAreaView>
           </SafeAreaView>
           <AdMobBanner
-            bannerSize="fullBanner"
-            adUnitID="ca-app-pub-3940256099942544/6300978111"
-            // adUnitID="ca-app-pub-1947127811333876/7886829387"
+            bannerSize="smartBannerPortrait"
+            adUnitID="ca-app-pub-1947127811333876/7886829387"
             servePersonalizedAds={true}
             onDidFailToReceiveAdWithError={(text) => {
               console.log("Erro ao carregar anúncio: ");
               console.log(text);
             }}
-            style={{ borderColor: colors.letraNormalClaro, borderWidth: 2 }}
+            style={{
+              borderColor: colors.letraNormalClaro,
+              borderWidth: 2,
+            }}
           />
         </ScrollView>
-        {/* <AdMobBanner
-        bannerSize="fullBanner"
-        adUnitID="ca-app-pub-1947127811333876/7886829387" // Test ID, Replace with your-admob-unit-id
-        servePersonalizedAds // true or false
-        onDidFailToReceiveAdWithError={(text) => {
-          console.log("Erro ao carregar anúncio: ");
-          console.log(text);
-        }}
-      /> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -125,10 +125,10 @@ export async function criarCliente(
     const token = await AsyncStorage.getItem("@appvet:token");
     const usuario = await carregarUsuario();
     var dtConvertida = null;
-    if (dtNasc != undefined && dtNasc != null && dtNasc != "") {
-      var dia = dtNasc.split("-")[0];
-      var mes = dtNasc.split("-")[1];
-      var ano = dtNasc.split("-")[2];
+    if (dtNasc !== undefined && dtNasc !== null && dtNasc !== "") {
+      let dia = dtNasc.split("-")[0];
+      let mes = dtNasc.split("-")[1];
+      let ano = dtNasc.split("-")[2];
       dtConvertida =
         ano + "-" + ("0" + mes).slice(-2) + "-" + ("0" + dia).slice(-2);
     }

@@ -15,11 +15,7 @@ import colors, { sizes, stylesPadrao } from "../../styles/colors";
 import Header from "../../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faArrowCircleDown,
-  faCat,
-  faXRay,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleDown, faCat } from "@fortawesome/free-solid-svg-icons";
 import DescricaoInput from "../../components/DescricaoInput";
 import { dtNascMask, getPixelSize, validarData } from "../../utils";
 import * as ImagePicker from "expo-image-picker";
@@ -30,8 +26,6 @@ export default function CriarAnimal({ navigation }) {
   const [dtNasc, setDtNasc] = useState("");
   const [dtNascMascarado, setDtNascMascarado] = useState("");
   const [image, setImage] = useState(null);
-  const [hasPermission, setHasPermission] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
   const [btnCriarAnimal, setBtnCriarAnimal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -53,13 +47,6 @@ export default function CriarAnimal({ navigation }) {
         console.log("Permissão da camera ok");
       }
     };
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
   }, []);
 
   async function pickImage() {
@@ -155,78 +142,6 @@ export default function CriarAnimal({ navigation }) {
             value={dtNascMascarado}
             ref={inputDtNasc}
           />
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-          >
-            <View
-              style={{
-                ...stylesPadrao.background,
-                alignSelf: "center",
-                // paddingVertical: "20%",
-                marginVertical: "10%",
-                flex: 0,
-                width: "95%",
-                height: "75%",
-                borderRadius: 10,
-                borderColor: colors.letraNormalClaro,
-                borderWidth: 5,
-              }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <Header title="Carregar imagens/fotos" />
-                <TouchableHighlight
-                  onPress={() => {
-                    setModalVisible(false);
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: colors.letraNormalClaro,
-                      fontSize: getPixelSize(7),
-                    }}
-                  >
-                    X
-                  </Text>
-                </TouchableHighlight>
-              </View>
-              <TouchableHighlight
-                style={{
-                  ...stylesPadrao.button,
-                  width: "70%",
-                  marginTop: 30,
-                }}
-                ref={btnEscolherDaGaleria}
-                onPress={() => {
-                  setModalVisible(false);
-                  pickImage();
-                }}
-              >
-                <Text style={stylesPadrao.textButton}>Escolher da galeria</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{ ...stylesPadrao.button, width: "70%" }}
-                ref={btnEscolherDaGaleria}
-                onPress={() => {
-                  setModalVisible(false);
-                  pickImage();
-                }}
-              >
-                <Text style={stylesPadrao.textButton}>Tirar uma foto</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{ ...stylesPadrao.button, width: "70%" }}
-                ref={btnEscolherDaGaleria}
-                onPress={() => {
-                  setModalVisible(false);
-                }}
-              >
-                <Text style={stylesPadrao.textButton}>Fechar</Text>
-              </TouchableHighlight>
-            </View>
-          </Modal>
-
           {image ? (
             <TouchableOpacity
               onPress={() => {
@@ -286,6 +201,73 @@ export default function CriarAnimal({ navigation }) {
           <Text style={stylesPadrao.textButton}>Criar animal</Text>
         </TouchableOpacity>
       </View>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View
+          style={{
+            ...stylesPadrao.background,
+            alignSelf: "center",
+            // paddingVertical: "20%",
+            marginVertical: "10%",
+            flex: 0,
+            width: "95%",
+            height: "75%",
+            borderRadius: 5,
+            borderColor: colors.letraNormalClaro,
+            borderWidth: 5,
+          }}
+        >
+          <View style={{ flexDirection: "row" }}>
+            <Header title="Carregar imagens/fotos" />
+            <TouchableHighlight
+              onPress={() => {
+                setModalVisible(false);
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.letraNormalClaro,
+                  fontSize: getPixelSize(7),
+                }}
+              >
+                X
+              </Text>
+            </TouchableHighlight>
+          </View>
+          <TouchableHighlight
+            style={{
+              ...stylesPadrao.button,
+              width: "70%",
+              marginTop: 30,
+            }}
+            ref={btnEscolherDaGaleria}
+            onPress={() => {
+              setModalVisible(false);
+              pickImage();
+            }}
+          >
+            <Text style={stylesPadrao.textButton}>Escolher da galeria</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={{ ...stylesPadrao.button, width: "70%" }}
+            ref={btnEscolherDaGaleria}
+            onPress={() => {
+              setModalVisible(false);
+            }}
+          >
+            <Text style={stylesPadrao.textButton}>Tirar uma foto</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={{ ...stylesPadrao.button, width: "70%" }}
+            ref={btnTirarFoto}
+            onPress={() => {
+              setModalVisible(false);
+              // setCameraVisible(true);
+            }}
+          >
+            <Text style={stylesPadrao.textButton}>Fechar</Text>
+          </TouchableHighlight>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

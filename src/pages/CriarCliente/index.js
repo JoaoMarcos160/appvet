@@ -18,6 +18,8 @@ import {
   ToastAndroid,
   Platform,
   ProgressBarAndroid,
+  Modal,
+  TouchableHighlight,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -30,6 +32,7 @@ import {
   cpfMask,
   criarCliente,
   dtNascMask,
+  getPixelSize,
   phoneMask,
   validarCPF,
   validarData,
@@ -37,6 +40,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import AsyncStorage from "@react-native-community/async-storage";
 import Loading from "../../components/Loading";
+import { AdMobBanner } from "expo-ads-admob";
 
 export default function CriarCliente({ navigation }) {
   const [nome, setNome] = useState("");
@@ -58,6 +62,7 @@ export default function CriarCliente({ navigation }) {
   const [email, setEmail] = useState("");
   const [observacao, setObservacao] = useState("");
   const [btnCriarCliente, setBtnCriarCliente] = useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
 
   const inputNome = useRef(null);
   const inputCpf = useRef(null);
@@ -73,6 +78,7 @@ export default function CriarCliente({ navigation }) {
   const inputEmail = useRef(null);
   const inputObservacao = useRef(null);
   const btnSalvar = useRef(null);
+  const modalInformacoes = useRef(null);
   //falta por bairro na Api-APPVEt
 
   async function buscarEndereco(cep) {
@@ -132,9 +138,6 @@ export default function CriarCliente({ navigation }) {
       if (endereco_retornado) {
         if (endereco_retornado.logradouro) {
           setEndereco(endereco_retornado.logradouro);
-        }
-        if (endereco_retornado.complemento) {
-          setComplemento(endereco_retornado.complemento);
         }
         if (endereco_retornado.bairro) {
           setBairro(endereco_retornado.bairro);
@@ -197,35 +200,12 @@ export default function CriarCliente({ navigation }) {
         observacao
       );
       if (result) {
-        //Limpando todos os campos
-        inputNome.current.clear();
-        inputCpf.current.clear();
-        inputTelefone.current.clear();
-        inputCep.current.clear();
-        inputEndereco.current.clear();
-        inputNumero.current.clear();
-        inputBairro.current.clear();
-        inputComplemento.current.clear();
-        inputCidade.current.clear();
-        inputEstado.current.clear();
-        inputDtNasc.current.clear();
-        inputEmail.current.clear();
-        inputObservacao.current.clear();
         //Sai do foco de todos os campos
         inputNome.current.blur();
         inputCpf.current.blur();
         inputTelefone.current.blur();
-        inputCep.current.blur();
-        inputEndereco.current.blur();
-        inputNumero.current.blur();
-        inputBairro.current.blur();
-        inputComplemento.current.blur();
-        inputCidade.current.blur();
-        inputEstado.current.blur();
-        inputDtNasc.current.blur();
-        inputEmail.current.blur();
-        inputObservacao.current.blur();
-        //Seta todos os estados para seu estado inicial
+
+        //Seta todos os estados para seu estado inicial e limpa todos os campos
         setNome("");
         setCpf("");
         setCpfMascarado("");
@@ -265,17 +245,6 @@ export default function CriarCliente({ navigation }) {
     <SafeAreaView style={stylesPadrao.background}>
       <Header title="Cadastrar cliente" />
       <View style={stylesPadrao.container}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text
-            style={{ color: colors.letraNormalClaro, margin: 5, opacity: 0.8 }}
-          >
-            Role a tela para mais informações
-          </Text>
-          <FontAwesomeIcon
-            icon={faArrowCircleDown}
-            color={colors.letraNormalClaro}
-          />
-        </View>
         <View>
           <Text
             style={{
@@ -300,6 +269,7 @@ export default function CriarCliente({ navigation }) {
               onChangeText={(nome) => {
                 setNome(nome);
               }}
+              value={nome}
               ref={inputNome}
               onSubmitEditing={() => {
                 inputCpf.current.focus();
@@ -342,215 +312,324 @@ export default function CriarCliente({ navigation }) {
               clearButtonMode="unless-editing"
               ref={inputTelefone}
               onSubmitEditing={() => {
-                inputCep.current.focus();
+                setVisibleModal(true);
+                setTimeout(() => {
+                  inputCep.current.focus();
+                }, 500);
+                // Esse setTimeout está aqui pra esperar a animação do Modal acabar
+                // e colocar o foco do cursor no campo do cep
               }}
             />
-            <DescricaoInput text="CEP" icon={faMapMarked} />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Digite o CEP"
-              autoCompleteType="off"
-              keyboardType="decimal-pad"
-              maxLength={10}
-              onChangeText={(cepInput) => {
-                setCepMascarado(cepMask(cepInput));
-                // console.log(cepMascarado);
-                setCep(cepInput.replace(/\D/g, ""));
-                // console.log(cep);
+            <TouchableOpacity
+              style={{ ...stylesPadrao.button, flex: 1, marginHorizontal: 10 }}
+              onPress={() => {
+                setVisibleModal(true);
               }}
-              onEndEditing={() => {
-                buscarEndereco(cep);
-              }}
-              onSubmitEditing={() => {
-                inputEndereco.current.focus();
-              }}
-              value={cepMascarado}
-              clearButtonMode="unless-editing"
-              ref={inputCep}
-            />
-            {loadingCep &&
-              (Platform.OS == "ios" ? (
-                <Loading styleView={styles.loadingCepView} />
-              ) : (
-                <ProgressBarAndroid
-                  styleAttr="Horizontal"
-                  color={colors.letraNormalClaro}
-                />
-              ))}
-            {loadingCep && (
-              <Text style={styles.textBuscandoEndereco}>
-                Buscando endereço pelo CEP, aguarde...
+              ref={btnSalvar}
+              disabled={btnCriarCliente}
+            >
+              <Text style={stylesPadrao.textButton}>
+                + Adicionar mais informações
               </Text>
-            )}
-            <DescricaoInput text="Endereço: " icon={faAddressBook} />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Endereço aqui"
-              autoCompleteType="street-address"
-              autoCapitalize="words"
-              keyboardType="ascii-capable"
-              maxLength={255}
-              onChangeText={(enderecoInput) => {
-                setEndereco(enderecoInput);
-              }}
-              onSubmitEditing={() => {
-                inputNumero.current.focus();
-              }}
-              editable={!loadingCep}
-              value={endereco}
-              clearButtonMode="unless-editing"
-              ref={inputEndereco}
-            />
-            <DescricaoInput text="Número: " />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Número aqui"
-              autoCompleteType="off"
-              keyboardType="visible-password"
-              maxLength={255}
-              onChangeText={(numeroInput) => {
-                setNumero(numeroInput);
-              }}
-              onSubmitEditing={() => {
-                inputComplemento.current.focus();
-              }}
-              editable={!loadingCep}
-              value={numero}
-              clearButtonMode="unless-editing"
-              ref={inputNumero}
-            />
-            <DescricaoInput text="Complemento: " />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Ex.: Apto 23 Bloco 4"
-              autoCompleteType="off"
-              autoCapitalize="sentences"
-              keyboardType="default"
-              maxLength={255}
-              onChangeText={(complementoInput) => {
-                setComplemento(complementoInput);
-              }}
-              onSubmitEditing={() => {
-                inputBairro.current.focus();
-              }}
-              editable={!loadingCep}
-              value={complemento}
-              clearButtonMode="unless-editing"
-              ref={inputComplemento}
-            />
-            <DescricaoInput text="Bairro: " />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Bairro aqui"
-              autoCompleteType="off"
-              autoCapitalize="words"
-              keyboardType="default"
-              maxLength={255}
-              onChangeText={(bairroInput) => {
-                setBairro(bairroInput);
-              }}
-              onSubmitEditing={() => {
-                inputCidade.current.focus();
-              }}
-              editable={!loadingCep}
-              value={bairro}
-              clearButtonMode="unless-editing"
-              ref={inputBairro}
-            />
-            <DescricaoInput text="Cidade" />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Cidade aqui"
-              autoCompleteType="off"
-              autoCapitalize="words"
-              keyboardType="ascii-capable"
-              maxLength={255}
-              onChangeText={(cidadeInput) => {
-                setCidade(cidadeInput);
-              }}
-              onSubmitEditing={() => {
-                inputEstado.current.focus();
-              }}
-              editable={!loadingCep}
-              value={cidade}
-              clearButtonMode="unless-editing"
-              ref={inputCidade}
-            />
-            <DescricaoInput text="Estado" />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Estado aqui"
-              autoCompleteType="off"
-              autoCapitalize="words"
-              keyboardType="ascii-capable"
-              maxLength={255}
-              onChangeText={(estadoInput) => {
-                setEstado(estadoInput);
-              }}
-              onSubmitEditing={() => {
-                inputDtNasc.current.focus();
-              }}
-              editable={!loadingCep}
-              value={estado}
-              clearButtonMode="unless-editing"
-              ref={inputEstado}
-            />
-            <DescricaoInput text="Data de nascimento:" icon={faAddressCard} />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="dd/mm/aaaa"
-              autoCompleteType="off"
-              keyboardType="decimal-pad"
-              maxLength={10}
-              onChangeText={(dtNascInput) => {
-                setdtNascMascarado(dtNascMask(dtNascInput));
-                setdtNasc(dtNascInput.replace(/\D/g, "-"));
-              }}
-              onSubmitEditing={() => {
-                inputEmail.current.focus();
-              }}
-              value={dtNascMascarado}
-              clearButtonMode="unless-editing"
-              ref={inputDtNasc}
-            />
-            <DescricaoInput text="Email:" />
-            <TextInput
-              style={stylesPadrao.textInput}
-              placeholder="Email aqui"
-              autoCompleteType="off"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              maxLength={100}
-              onChangeText={(emailInput) => {
-                setEmail(emailInput);
-              }}
-              onSubmitEditing={() => {
-                inputObservacao.current.focus();
-              }}
-              value={email}
-              clearButtonMode="unless-editing"
-              ref={inputEmail}
-            />
-            <DescricaoInput text="Observações:" />
-            <TextInput
-              style={stylesPadrao.multiLineTextInput}
-              placeholder="Coloque aqui suas observações"
-              autoCompleteType="off"
-              autoCapitalize="sentences"
-              keyboardType="default"
-              // maxLength={5000}
-              onChangeText={(observacaoInput) => {
-                setObservacao(observacaoInput);
-              }}
-              onSubmitEditing={() => {
-                createClient();
-              }}
-              multiline={true}
-              numberOfLines={8}
-              value={observacao}
-              clearButtonMode="unless-editing"
-              ref={inputObservacao}
-            />
+            </TouchableOpacity>
+            <Modal
+              visible={visibleModal}
+              animationType="slide"
+              ref={modalInformacoes}
+            >
+              <ScrollView>
+                <View style={stylesPadrao.background}>
+                  <View style={stylesPadrao.viewInput}>
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: "row",
+                      }}
+                    >
+                      <View style={{ marginLeft: 7 }}>
+                        <Header title="Outras informações" />
+                      </View>
+                      <TouchableHighlight
+                        onPress={() => {
+                          setVisibleModal(false);
+                        }}
+                        style={{
+                          flex: 1,
+                          alignSelf: "flex-start",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: colors.letraNormalClaro,
+                            fontSize: getPixelSize(7),
+                            textAlign: "right",
+                            padding: 5,
+                            margin: 5,
+                          }}
+                        >
+                          X
+                        </Text>
+                      </TouchableHighlight>
+                    </View>
+                    {/* <Text style={stylesPadrao.text}>Outras informações</Text> */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: colors.letraNormalClaro,
+                          margin: 5,
+                          opacity: 0.8,
+                        }}
+                      >
+                        Role a tela para mais informações
+                      </Text>
+                      <FontAwesomeIcon
+                        icon={faArrowCircleDown}
+                        color={colors.letraNormalClaro}
+                      />
+                    </View>
+                    <DescricaoInput text="CEP" icon={faMapMarked} />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Digite o CEP"
+                      autoCompleteType="off"
+                      keyboardType="decimal-pad"
+                      maxLength={10}
+                      onChangeText={(cepInput) => {
+                        if (cepInput.length >= 10) {
+                          setCepMascarado(cepMask(cepInput));
+                          setCep(cepInput.replace(/\D/g, ""));
+                          buscarEndereco(cepInput.replace(/\D/g, ""));
+                        } else {
+                          setCepMascarado(cepMask(cepInput));
+                          setCep(cepInput.replace(/\D/g, ""));
+                        }
+                      }}
+                      onSubmitEditing={() => {
+                        inputEndereco.current.focus();
+                      }}
+                      value={cepMascarado}
+                      clearButtonMode="unless-editing"
+                      ref={inputCep}
+                    />
+                    {loadingCep &&
+                      (Platform.OS == "ios" ? (
+                        <Loading styleView={styles.loadingCepView} />
+                      ) : (
+                        <ProgressBarAndroid
+                          styleAttr="Horizontal"
+                          color={colors.letraNormalClaro}
+                        />
+                      ))}
+                    {loadingCep && (
+                      <Text style={styles.textBuscandoEndereco}>
+                        Buscando endereço pelo CEP, aguarde...
+                      </Text>
+                    )}
+                    <DescricaoInput text="Endereço: " icon={faAddressBook} />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Endereço aqui"
+                      autoCompleteType="street-address"
+                      autoCapitalize="words"
+                      keyboardType="ascii-capable"
+                      maxLength={255}
+                      onChangeText={(enderecoInput) => {
+                        setEndereco(enderecoInput);
+                      }}
+                      onSubmitEditing={() => {
+                        inputNumero.current.focus();
+                      }}
+                      editable={!loadingCep}
+                      value={endereco}
+                      clearButtonMode="unless-editing"
+                      ref={inputEndereco}
+                    />
+                    <DescricaoInput text="Número: " />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Número aqui"
+                      autoCompleteType="off"
+                      keyboardType="visible-password"
+                      maxLength={255}
+                      onChangeText={(numeroInput) => {
+                        setNumero(numeroInput);
+                      }}
+                      onSubmitEditing={() => {
+                        inputComplemento.current.focus();
+                      }}
+                      editable={!loadingCep}
+                      value={numero}
+                      clearButtonMode="unless-editing"
+                      ref={inputNumero}
+                    />
+                    <DescricaoInput text="Complemento: " />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Ex.: Apto 23 Bloco 4"
+                      autoCompleteType="off"
+                      autoCapitalize="sentences"
+                      keyboardType="default"
+                      maxLength={255}
+                      onChangeText={(complementoInput) => {
+                        setComplemento(complementoInput);
+                      }}
+                      onSubmitEditing={() => {
+                        inputBairro.current.focus();
+                      }}
+                      editable={!loadingCep}
+                      value={complemento}
+                      clearButtonMode="unless-editing"
+                      ref={inputComplemento}
+                    />
+                    <DescricaoInput text="Bairro: " />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Bairro aqui"
+                      autoCompleteType="off"
+                      autoCapitalize="words"
+                      keyboardType="default"
+                      maxLength={255}
+                      onChangeText={(bairroInput) => {
+                        setBairro(bairroInput);
+                      }}
+                      onSubmitEditing={() => {
+                        inputCidade.current.focus();
+                      }}
+                      editable={!loadingCep}
+                      value={bairro}
+                      clearButtonMode="unless-editing"
+                      ref={inputBairro}
+                    />
+                    <DescricaoInput text="Cidade" />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Cidade aqui"
+                      autoCompleteType="off"
+                      autoCapitalize="words"
+                      keyboardType="ascii-capable"
+                      maxLength={255}
+                      onChangeText={(cidadeInput) => {
+                        setCidade(cidadeInput);
+                      }}
+                      onSubmitEditing={() => {
+                        inputEstado.current.focus();
+                      }}
+                      editable={!loadingCep}
+                      value={cidade}
+                      clearButtonMode="unless-editing"
+                      ref={inputCidade}
+                    />
+                    <DescricaoInput text="Estado" />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Estado aqui"
+                      autoCompleteType="off"
+                      autoCapitalize="words"
+                      keyboardType="ascii-capable"
+                      maxLength={255}
+                      onChangeText={(estadoInput) => {
+                        setEstado(estadoInput);
+                      }}
+                      onSubmitEditing={() => {
+                        inputDtNasc.current.focus();
+                      }}
+                      editable={!loadingCep}
+                      value={estado}
+                      clearButtonMode="unless-editing"
+                      ref={inputEstado}
+                    />
+                    <DescricaoInput
+                      text="Data de nascimento:"
+                      icon={faAddressCard}
+                    />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="dd/mm/aaaa"
+                      autoCompleteType="off"
+                      keyboardType="decimal-pad"
+                      maxLength={10}
+                      onChangeText={(dtNascInput) => {
+                        setdtNascMascarado(dtNascMask(dtNascInput));
+                        setdtNasc(dtNascInput.replace(/\D/g, "-"));
+                      }}
+                      onSubmitEditing={() => {
+                        inputEmail.current.focus();
+                      }}
+                      value={dtNascMascarado}
+                      clearButtonMode="unless-editing"
+                      ref={inputDtNasc}
+                    />
+                    <DescricaoInput text="Email:" />
+                    <TextInput
+                      style={stylesPadrao.textInput}
+                      placeholder="Email aqui"
+                      autoCompleteType="off"
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      maxLength={100}
+                      onChangeText={(emailInput) => {
+                        setEmail(emailInput);
+                      }}
+                      onSubmitEditing={() => {
+                        inputObservacao.current.focus();
+                      }}
+                      value={email}
+                      clearButtonMode="unless-editing"
+                      ref={inputEmail}
+                    />
+                    <DescricaoInput text="Observações:" />
+                    <TextInput
+                      style={stylesPadrao.multiLineTextInput}
+                      placeholder="Coloque aqui suas observações"
+                      autoCompleteType="off"
+                      autoCapitalize="sentences"
+                      keyboardType="default"
+                      // maxLength={5000}
+                      onChangeText={(observacaoInput) => {
+                        setObservacao(observacaoInput);
+                      }}
+                      onSubmitEditing={() => {
+                        createClient();
+                      }}
+                      multiline={true}
+                      numberOfLines={8}
+                      value={observacao}
+                      clearButtonMode="unless-editing"
+                      ref={inputObservacao}
+                    />
+                    <TouchableOpacity
+                      style={stylesPadrao.button}
+                      onPress={() => {
+                        setVisibleModal(false);
+                      }}
+                    >
+                      <Text style={stylesPadrao.textButton}>
+                        Salvar e voltar
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <AdMobBanner
+                  bannerSize="smartBannerPortrait"
+                  // adUnitID="ca-app-pub-3940256099942544/6300978111"
+                  adUnitID="ca-app-pub-1947127811333876/7886829387"
+                  servePersonalizedAds={true}
+                  onDidFailToReceiveAdWithError={(text) => {
+                    console.log("Erro ao carregar anúncio: ");
+                    console.log(text);
+                  }}
+                  style={{
+                    borderColor: colors.letraNormalClaro,
+                    borderWidth: 2,
+                  }}
+                />
+              </ScrollView>
+            </Modal>
           </View>
         </ScrollView>
 
