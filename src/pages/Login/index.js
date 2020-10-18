@@ -77,6 +77,9 @@ export default function Login({ navigation }) {
 
   //Funções
   async function validaUsuario(user, password) {
+    // Para liberar acesso com qualquer login só descomentar essa linhas   abaixo
+    // navigation.navigate("Home");
+    // return;
     if (user == "") {
       Alert.alert("Digite seu usuário!");
       setBtnAcessarDisable(false);

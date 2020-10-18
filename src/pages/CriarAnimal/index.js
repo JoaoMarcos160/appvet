@@ -252,6 +252,7 @@ export default function CriarAnimal({ navigation }) {
             ref={btnEscolherDaGaleria}
             onPress={() => {
               setModalVisible(false);
+              navigation.navigate("Camera");
             }}
           >
             <Text style={stylesPadrao.textButton}>Tirar uma foto</Text>
@@ -261,7 +262,6 @@ export default function CriarAnimal({ navigation }) {
             ref={btnTirarFoto}
             onPress={() => {
               setModalVisible(false);
-              // setCameraVisible(true);
             }}
           >
             <Text style={stylesPadrao.textButton}>Fechar</Text>

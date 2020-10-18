@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import api, { apiViaCep } from "./services/api";
 import { messages } from "./messages";
 import { or } from "react-native-reanimated";
+import { AdMobInterstitial, AdMobRewarded } from "expo-ads-admob";
 
 export function getPixelSize(pixels) {
   //pra pegar o tamanho dos pixels e não dar diferença na densidade de pixels em telas maiores ou menores
@@ -320,4 +321,17 @@ export async function buscarEndereçoPeloViaCep(cep) {
     console.log(error);
     return false;
   }
+}
+
+export async function mostrarPropaganda() {
+  await AdMobInterstitial.setAdUnitID("ca-app-pub-1947127811333876/9381235264");
+  await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+  await AdMobInterstitial.showAdAsync();
+}
+
+export async function mostrarPropagandaComRecompensa() {
+  await AdMobRewarded.setAdUnitID("ca-app-pub-1947127811333876/2417722735");
+  await AdMobRewarded.requestAdAsync();
+  await AdMobRewarded.showAdAsync();
+  return;
 }

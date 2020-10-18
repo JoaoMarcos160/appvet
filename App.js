@@ -7,6 +7,8 @@ import Doencas from "./src/pages/Doencas";
 import CriarConta from "./src/pages/CriarConta";
 import CriarCliente from "./src/pages/CriarCliente";
 import CriarAnimal from "./src/pages/CriarAnimal";
+import Propaganda from "./src/pages/Propaganda";
+import Camera from "./src/pages/Camera";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -19,6 +21,8 @@ import {
   faIdCard,
   faUserCircle,
   faDog,
+  faAd,
+  faCamera,
 } from "@fortawesome/free-solid-svg-icons";
 import colors, { sizes } from "./src/styles/colors";
 import { StatusBar } from "expo-status-bar";
@@ -122,6 +126,19 @@ export default function App() {
           }}
         />
         <Drawer.Screen
+          name="Camera"
+          component={Camera}
+          options={{
+            drawerIcon: () => (
+              <FontAwesomeIcon
+                icon={faCamera}
+                color={colors.letraNormalClaro}
+                size={sizes.iconDrawer}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
           name="Criar Conta"
           component={CriarConta}
           options={{
@@ -130,6 +147,19 @@ export default function App() {
             drawerIcon: () => (
               <FontAwesomeIcon
                 icon={faUserCircle}
+                color={colors.letraNormalClaro}
+                size={sizes.iconDrawer}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="Propaganda"
+          component={Propaganda}
+          options={{
+            drawerIcon: () => (
+              <FontAwesomeIcon
+                icon={faAd}
                 color={colors.letraNormalClaro}
                 size={sizes.iconDrawer}
               />
