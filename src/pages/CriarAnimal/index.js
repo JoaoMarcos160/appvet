@@ -8,6 +8,7 @@ import {
   Dimensions,
   Modal,
   TouchableHighlight,
+  StyleSheet,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import colors, { sizes, stylesPadrao } from "../../styles/colors";
@@ -20,26 +21,40 @@ import {
   faIdBadge,
 } from "@fortawesome/free-solid-svg-icons";
 import DescricaoInput from "../../components/DescricaoInput";
-import { dtNascMask, getPixelSize, validarData } from "../../utils";
+import {
+  criarAnimal,
+  dtNascMask,
+  getPixelSize,
+  listarClientes,
+  validarData,
+} from "../../utils";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import PageCamera from "../Camera";
 import { Picker } from "@react-native-community/picker";
+import AsyncStorage from "@react-native-community/async-storage";
+import Loading from "../../components/Loading";
 
 export default function CriarAnimal({ navigation }) {
   const [nome, setNome] = useState("");
   const [dtNasc, setDtNasc] = useState("");
   const [dtNascMascarado, setDtNascMascarado] = useState("");
+  const [cliente_id, setCliente_id] = useState("");
   const [image, setImage] = useState(null);
   const [btnCriarAnimal, setBtnCriarAnimal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleCamera, setModalVisibleCamera] = useState(false);
+  const [listaDeClientes, setListaDeClientes] = useState(null);
 
   const inputNome = useRef(null);
   const inputDtNasc = useRef(null);
   const btnSalvar = useRef(null);
   const btnEscolherDaGaleria = useRef(null);
   const btnTirarFoto = useRef(null);
+
+  useEffect(() => {
+    listar_clientes();
+  }, []);
 
   useEffect(() => {
     async () => {
@@ -83,8 +98,13 @@ export default function CriarAnimal({ navigation }) {
       );
       inputDtNasc.current.focus();
     } else {
+      let response = criarAnimal();
     }
     setBtnCriarAnimal(false);
+  }
+
+  async function listar_clientes() {
+    setListaDeClientes(await listarClientes());
   }
 
   return (
@@ -119,6 +139,7 @@ export default function CriarAnimal({ navigation }) {
           <TextInput
             style={stylesPadrao.textInput}
             placeholder="Digite o nome aqui"
+            placeholderTextColor={colors.placeHolderColor}
             autoCompleteType="off"
             autoCapitalize="words"
             maxLength={255}
@@ -126,27 +147,52 @@ export default function CriarAnimal({ navigation }) {
               setNome(nome);
             }}
             onSubmitEditing={() => {
-              inputDtNasc.current.focus();
+              // inputDtNasc.current.focus();
+              listar_clientes();
             }}
             ref={inputNome}
           />
           <DescricaoInput text="Cliente/Dono" icon={faIdBadge} />
-          <Picker
-            // mode="dropdown"
-            // selectedValue={}
-            style={{ height: 50, width: 100 }}
-            onValueChange={(itemValue, itemIndex) => {
-              console.log(itemValue);
+          <View
+            style={{
+              ...stylesPadrao.textInput,
+              paddingBottom: 20,
+              paddingTop: 0,
             }}
           >
-            <Picker.Item label="teste" value="teste" />
-            <Picker.Item label="teste1" value="teste1" />
-            <Picker.Item label="teste2" value="teste2" />
-          </Picker>
+            <Picker
+              mode="dialog"
+              prompt="Escolha o cliente:"
+              removeClippedSubviews={true}
+              itemStyle={styles.pickerItem}
+              selectedValue={cliente_id}
+              style={styles.picker}
+              onValueChange={(itemValue, itemIndex) => {
+                setCliente_id(itemValue);
+                console.log(itemValue);
+              }}
+            >
+              {listaDeClientes !== null ? (
+                listaDeClientes.data.map((element, index) => {
+                  return (
+                    <Picker.Item
+                      label={element.nome}
+                      value={element.id}
+                      key={element.id}
+                    />
+                  );
+                })
+              ) : (
+                <Picker.Item label="Buscando clientes" value="null" />
+              )}
+            </Picker>
+            {listaDeClientes == null && <Loading />}
+          </View>
           <DescricaoInput text="Data de nascimento:" />
           <TextInput
             style={stylesPadrao.textInput}
             placeholder="dd/mm/aaaa"
+            placeholderTextColor={colors.placeHolderColor}
             autoCompleteType="off"
             keyboardType="decimal-pad"
             maxLength={10}
@@ -307,3 +353,16 @@ export default function CriarAnimal({ navigation }) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  pickerItem: {
+    color: colors.letraNormalClaro,
+    backgroundColor: colors.backgroundPadrao,
+  },
+  picker: {
+    color: colors.letraNormalClaro,
+    borderWidth: 1,
+    borderColor: colors.letraNormalClaro,
+    width: "auto",
+  },
+});

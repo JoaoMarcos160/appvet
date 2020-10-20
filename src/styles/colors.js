@@ -15,6 +15,7 @@ const colors = {
   colorInput: "#222",
   backgroundLogin: "#191919",
   backgroundPadrao: "#191919",
+  placeHolderColor: "#fff5",
 };
 
 export const sizes = {

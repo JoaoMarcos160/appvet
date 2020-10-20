@@ -263,6 +263,7 @@ export default function CriarCliente({ navigation }) {
             <TextInput
               style={stylesPadrao.textInput}
               placeholder="Digite o nome aqui"
+              placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="off"
               autoCapitalize="words"
               maxLength={255}
@@ -281,6 +282,7 @@ export default function CriarCliente({ navigation }) {
             <TextInput
               style={stylesPadrao.textInput}
               placeholder="CPF (apenas números)"
+              placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="off"
               keyboardType="decimal-pad"
               maxLength={14}
@@ -301,6 +303,7 @@ export default function CriarCliente({ navigation }) {
             <TextInput
               style={stylesPadrao.textInput}
               placeholder="Telefone (com DDD)"
+              placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="off"
               keyboardType="decimal-pad"
               maxLength={15}
@@ -396,6 +399,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Digite o CEP"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       keyboardType="decimal-pad"
                       maxLength={10}
@@ -434,6 +438,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Endereço aqui"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="street-address"
                       autoCapitalize="words"
                       keyboardType="ascii-capable"
@@ -453,6 +458,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Número aqui"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       keyboardType="visible-password"
                       maxLength={255}
@@ -471,6 +477,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Ex.: Apto 23 Bloco 4"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       autoCapitalize="sentences"
                       keyboardType="default"
@@ -490,6 +497,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Bairro aqui"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       autoCapitalize="words"
                       keyboardType="default"
@@ -509,6 +517,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Cidade aqui"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       autoCapitalize="words"
                       keyboardType="ascii-capable"
@@ -528,6 +537,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Estado aqui"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       autoCapitalize="words"
                       keyboardType="ascii-capable"
@@ -550,6 +560,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="dd/mm/aaaa"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       keyboardType="decimal-pad"
                       maxLength={10}
@@ -568,6 +579,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.textInput}
                       placeholder="Email aqui"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       autoCapitalize="none"
                       keyboardType="email-address"
@@ -586,6 +598,7 @@ export default function CriarCliente({ navigation }) {
                     <TextInput
                       style={stylesPadrao.multiLineTextInput}
                       placeholder="Coloque aqui suas observações"
+                      placeholderTextColor={colors.placeHolderColor}
                       autoCompleteType="off"
                       autoCapitalize="sentences"
                       keyboardType="default"

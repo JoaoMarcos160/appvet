@@ -335,3 +335,51 @@ export async function mostrarPropagandaComRecompensa() {
   await AdMobRewarded.showAdAsync();
   return;
 }
+
+export async function listarClientes() {
+  const token = await AsyncStorage.getItem("@appvet:token");
+  const usuario = await carregarUsuario();
+  try {
+    const response = await api.post("/clientes/listar", {
+      token: token,
+      usuario_id: usuario.id,
+    });
+    // console.log(response.data.data);
+    if (response.status == 200) {
+      console.log("Clientes listados com sucesso");
+      return response.data;
+    }
+    Alert.alert(response.data.data.msg);
+    return false;
+  } catch (response) {
+    console.log("ENTREI NO CATCH");
+    console.log("response: ");
+    console.log(response);
+    alertsProblemaConexao(response.problem);
+    return false;
+  }
+}
+
+export async function criarAnimal() {
+  const token = await AsyncStorage.getItem("@appvet:token");
+  const usuario = await carregarUsuario();
+  try {
+    const response = await api.post("/animais/", {
+      token: token,
+      usuario_id: usuario.id,
+    });
+    // console.log(response.data.data);
+    if (response.status == 201) {
+      console.log("Animal criado com sucesso");
+      return true;
+    }
+    Alert.alert(response.data.data.msg);
+    return false;
+  } catch (response) {
+    console.log("ENTREI NO CATCH");
+    console.log("response: ");
+    console.log(response);
+    alertsProblemaConexao(response.problem);
+    return false;
+  }
+}

@@ -158,6 +158,7 @@ export default function Login({ navigation }) {
           <TextInput
             style={styles.inputs}
             placeholder="Usuário"
+            placeholderTextColor={colors.placeHolderColor}
             autoCompleteType="username"
             autoCapitalize="none"
             keyboardType="email-address"
@@ -182,6 +183,7 @@ export default function Login({ navigation }) {
           <TextInput
             style={styles.inputs}
             placeholder="Senha"
+            placeholderTextColor={colors.placeHolderColor}
             autoCompleteType="password"
             secureTextEntry={true}
             autoCorrect={false}

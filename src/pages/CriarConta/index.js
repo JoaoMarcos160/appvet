@@ -109,6 +109,7 @@ export default function CriarConta({ navigation }) {
             <TextInput
               style={styles.textInput}
               placeholder="Digite seu nome aqui"
+              placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="name"
               onChangeText={(nome) => {
                 setNome(nome);
@@ -121,6 +122,7 @@ export default function CriarConta({ navigation }) {
             <TextInput
               style={styles.textInput}
               placeholder="Digite um nome de usuário aqui"
+              placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="email"
               autoCapitalize="none"
               onChangeText={(login) => {
@@ -134,6 +136,7 @@ export default function CriarConta({ navigation }) {
             <TextInput
               style={styles.textInput}
               placeholder="Digite uma senha"
+              placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="password"
               secureTextEntry={true}
               onChangeText={(senha) => {
@@ -147,6 +150,7 @@ export default function CriarConta({ navigation }) {
             <TextInput
               style={styles.textInput}
               placeholder="Repita sua senha"
+              placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="password"
               secureTextEntry={true}
               onChangeText={(senhaconfirm) => {
