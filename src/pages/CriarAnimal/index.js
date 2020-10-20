@@ -7,7 +7,6 @@ import {
   Alert,
   Dimensions,
   Modal,
-  Button,
   TouchableHighlight,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
@@ -15,11 +14,17 @@ import colors, { sizes, stylesPadrao } from "../../styles/colors";
 import Header from "../../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faArrowCircleDown, faCat } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowCircleDown,
+  faCat,
+  faIdBadge,
+} from "@fortawesome/free-solid-svg-icons";
 import DescricaoInput from "../../components/DescricaoInput";
 import { dtNascMask, getPixelSize, validarData } from "../../utils";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
+import PageCamera from "../Camera";
+import { Picker } from "@react-native-community/picker";
 
 export default function CriarAnimal({ navigation }) {
   const [nome, setNome] = useState("");
@@ -28,6 +33,7 @@ export default function CriarAnimal({ navigation }) {
   const [image, setImage] = useState(null);
   const [btnCriarAnimal, setBtnCriarAnimal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisibleCamera, setModalVisibleCamera] = useState(false);
 
   const inputNome = useRef(null);
   const inputDtNasc = useRef(null);
@@ -124,6 +130,19 @@ export default function CriarAnimal({ navigation }) {
             }}
             ref={inputNome}
           />
+          <DescricaoInput text="Cliente/Dono" icon={faIdBadge} />
+          <Picker
+            // mode="dropdown"
+            // selectedValue={}
+            style={{ height: 50, width: 100 }}
+            onValueChange={(itemValue, itemIndex) => {
+              console.log(itemValue);
+            }}
+          >
+            <Picker.Item label="teste" value="teste" />
+            <Picker.Item label="teste1" value="teste1" />
+            <Picker.Item label="teste2" value="teste2" />
+          </Picker>
           <DescricaoInput text="Data de nascimento:" />
           <TextInput
             style={stylesPadrao.textInput}
@@ -251,8 +270,12 @@ export default function CriarAnimal({ navigation }) {
             style={{ ...stylesPadrao.button, width: "70%" }}
             ref={btnEscolherDaGaleria}
             onPress={() => {
+              Alert.alert(
+                "Função em desenvolvimento",
+                "Ainda estamos trabalhando nessa função! Mas em breve você poderá colocar fotos tiradas na hora! 😉"
+              );
               setModalVisible(false);
-              navigation.navigate("Camera");
+              // setModalVisibleCamera(true);
             }}
           >
             <Text style={stylesPadrao.textButton}>Tirar uma foto</Text>
@@ -268,6 +291,19 @@ export default function CriarAnimal({ navigation }) {
           </TouchableHighlight>
         </View>
       </Modal>
+      {/*Modal da camera*/}
+      {/* <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVisibleCamera}
+        onShow={() => {
+          setTimeout(() => {
+            setModalVisibleCamera(false);
+          }, 40000);
+        }}
+      >
+        <PageCamera />
+      </Modal> */}
     </SafeAreaView>
   );
 }

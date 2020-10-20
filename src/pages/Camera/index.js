@@ -7,6 +7,7 @@ import {
   Alert,
   Modal,
   Image,
+  StyleSheet,
 } from "react-native";
 import { Camera } from "expo-camera";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -22,7 +23,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import Animated, { Easing } from "react-native-reanimated";
 
-export default function PageCamera() {
+export default function PageCamera({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [autoFocus] = useState(Camera.Constants.AutoFocus.on);
@@ -74,7 +75,26 @@ export default function PageCamera() {
     return <View />;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return (
+      <SafeAreaView style={stylesPadrao.background}>
+        <Text
+          style={{
+            ...stylesPadrao.text,
+            marginVertical: (screenHeigth * 0.9) / 2,
+          }}
+        >
+          Precisamos de acesso a câmera!
+        </Text>
+        <TouchableOpacity
+          style={{ ...stylesPadrao.button, width: "70%" }}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <Text style={stylesPadrao.textButton}>Voltar</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
   }
 
   async function tirarFoto() {
@@ -94,6 +114,7 @@ export default function PageCamera() {
       setFlashMode(Camera.Constants.FlashMode.off);
     }
   }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={colors.backgroundPadrao} style="light" />
@@ -165,7 +186,7 @@ export default function PageCamera() {
                 } else {
                   Alert.alert(
                     "Câmera não está pronta!",
-                    "Aguarde alguns segundos e tente novamente"
+                    "Aguarde alguns segundos e tente novamente!"
                   );
                 }
               }}
@@ -190,13 +211,7 @@ export default function PageCamera() {
           >
             <View style={{ flexDirection: "column" }}>
               {flashMode === Camera.Constants.FlashMode.off && (
-                <View
-                  style={{
-                    flex: 0,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
+                <View style={styles.iconFlashMode}>
                   <FontAwesomeIcon
                     icon={faBolt}
                     color="#ffe"
@@ -211,13 +226,7 @@ export default function PageCamera() {
                 </View>
               )}
               {flashMode === Camera.Constants.FlashMode.on && (
-                <View
-                  style={{
-                    flex: 0,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
+                <View style={styles.iconFlashMode}>
                   <FontAwesomeIcon
                     icon={faBolt}
                     color="#ffe"
@@ -270,8 +279,24 @@ export default function PageCamera() {
           >
             <Text style={stylesPadrao.text}>Tirar outra foto</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setVisibleModal(false);
+              return true;
+            }}
+          >
+            <Text style={stylesPadrao.text}>Usar essa foto</Text>
+          </TouchableOpacity>
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  iconFlashMode: {
+    flex: 0,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+});

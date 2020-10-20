@@ -125,7 +125,7 @@ export default function App() {
             ),
           }}
         />
-        <Drawer.Screen
+        {/* <Drawer.Screen
           name="Camera"
           component={Camera}
           options={{
@@ -137,7 +137,7 @@ export default function App() {
               />
             ),
           }}
-        />
+        /> */}
         <Drawer.Screen
           name="Criar Conta"
           component={CriarConta}
