@@ -68,7 +68,7 @@ export default function PageCamera({ navigation }) {
       }).start();
       setFlagRodarItem(true);
     }
-    console.log("mudou o type");
+    console.log("Mudou o type da camera");
   }, [type]);
 
   if (hasPermission === null) {

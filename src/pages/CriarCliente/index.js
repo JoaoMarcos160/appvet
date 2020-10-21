@@ -422,7 +422,7 @@ export default function CriarCliente({ navigation }) {
                     />
                     {loadingCep &&
                       (Platform.OS == "ios" ? (
-                        <Loading styleView={styles.loadingCepView} />
+                        <Loading styleView={stylesPadrao.loadingProgressBar} />
                       ) : (
                         <ProgressBarAndroid
                           styleAttr="Horizontal"
@@ -430,7 +430,7 @@ export default function CriarCliente({ navigation }) {
                         />
                       ))}
                     {loadingCep && (
-                      <Text style={styles.textBuscandoEndereco}>
+                      <Text style={stylesPadrao.textProgressBar}>
                         Buscando endereço pelo CEP, aguarde...
                       </Text>
                     )}
@@ -661,16 +661,4 @@ export default function CriarCliente({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  loadingCepView: {
-    flexWrap: "wrap",
-    margin: 0,
-  },
-  textBuscandoEndereco: {
-    color: colors.letraNormalClaro,
-    fontSize: sizes.letraPequena,
-    textAlign: "center",
-    borderBottomColor: colors.letraNormalClaro,
-    borderBottomWidth: 2,
-  },
-});
+const styles = StyleSheet.create({});

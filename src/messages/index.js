@@ -1,6 +1,7 @@
 export const messages = {
   sem_conexao: "Sem conexão",
   sem_conexao_com_internet: "Sem conexão com a internet",
+  erro_com_servidor: "Houve um erro com o servidor",
   usuario_nao_encontrado: "Usuário não encotrado",
   senha_incorreta: "Senha incorreta",
   algo_deu_errado: "Algo deu errado!",

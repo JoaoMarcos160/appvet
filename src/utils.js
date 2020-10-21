@@ -107,6 +107,18 @@ export async function criarUsuario(nome, login, senha, permissao, navigation) {
   }
 }
 
+function converterDataParaApi(dtNasc) {
+  if (dtNasc !== undefined && dtNasc !== null && dtNasc !== "") {
+    let dia = dtNasc.split("-")[0];
+    let mes = dtNasc.split("-")[1];
+    let ano = dtNasc.split("-")[2];
+    let dtConvertida;
+    return (dtConvertida =
+      ano + "-" + ("0" + mes).slice(-2) + "-" + ("0" + dia).slice(-2));
+  }
+  return "";
+}
+
 export async function criarCliente(
   nome,
   cpf,
@@ -125,14 +137,7 @@ export async function criarCliente(
   try {
     const token = await AsyncStorage.getItem("@appvet:token");
     const usuario = await carregarUsuario();
-    var dtConvertida = null;
-    if (dtNasc !== undefined && dtNasc !== null && dtNasc !== "") {
-      let dia = dtNasc.split("-")[0];
-      let mes = dtNasc.split("-")[1];
-      let ano = dtNasc.split("-")[2];
-      dtConvertida =
-        ano + "-" + ("0" + mes).slice(-2) + "-" + ("0" + dia).slice(-2);
-    }
+    let dtConvertida = converterDataParaApi(dtNasc);
     const response = await api.post("/clientes/", {
       token: token,
       usuario_id: usuario.id,
@@ -182,7 +187,7 @@ export async function validarUsuarios(user, password) {
       ToastAndroid.showWithGravity(
         messages.login_sucesso,
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER
+        ToastAndroid.BOTTOM
       );
       return true;
     }
@@ -210,7 +215,7 @@ async function alertsProblemaConexao(problem) {
       // return messages.sem_conexao;
       break;
     case "SERVER_ERROR":
-      Alert.alert(messages.sem_conexao, messages.erro);
+      Alert.alert(messages.erro_com_servidor, messages.tente_novamente);
       console.log("erro com o servidor");
       // return messages.sem_conexao;
       break;
@@ -360,20 +365,74 @@ export async function listarClientes() {
   }
 }
 
-export async function criarAnimal() {
+export async function criarAnimal(
+  nome_animal,
+  cliente_id,
+  dt_nasc,
+  observacao,
+  microchip,
+  tag,
+  sexo,
+  castrado,
+  cor,
+  foto = null
+) {
   const token = await AsyncStorage.getItem("@appvet:token");
   const usuario = await carregarUsuario();
+  const dtConvertida = converterDataParaApi(dt_nasc);
+  const headers = {
+    "Content-Type": "multipart/form-data",
+  };
   try {
-    const response = await api.post("/animais/", {
-      token: token,
-      usuario_id: usuario.id,
-    });
-    // console.log(response.data.data);
+    var response;
+    if (foto == null) {
+      response = await api.post("/animais", {
+        token: token,
+        usuario_id: usuario.id,
+        nome_animal: nome_animal,
+        cliente_id: cliente_id,
+        dt_nasc: dtConvertida,
+        observacao: observacao,
+        microchip: microchip,
+        tag: tag,
+        sexo: sexo,
+        castrado: castrado,
+        cor: cor,
+      });
+    } else {
+      const form = new FormData();
+      form.append(
+        "foto_animal",
+        {
+          uri: foto.uri,
+          name: "image.jpg",
+          type: "image/jpeg",
+        },
+        "foto_animal.jpg"
+      );
+      form.append("token", token);
+      form.append("usuario_id", usuario.id);
+      form.append("nome_animal", nome_animal);
+      form.append("cliente_id", cliente_id);
+      form.append("dt_nasc", dtConvertida);
+      form.append("microchip", microchip);
+      form.append("tag", tag);
+      form.append("sexo", sexo);
+      form.append("castrado", castrado);
+      form.append("cor", cor);
+
+      response = await api.post("/animais", form, { ...headers });
+    }
+    console.log(response);
     if (response.status == 201) {
       console.log("Animal criado com sucesso");
       return true;
     }
-    Alert.alert(response.data.data.msg);
+    if (response.data.data.msg != undefined) {
+      Alert.alert(response.data.data.msg);
+    } else {
+      Alert.alert(messages.algo_deu_errado, messages.contato_dev);
+    }
     return false;
   } catch (response) {
     console.log("ENTREI NO CATCH");

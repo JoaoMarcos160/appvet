@@ -9,6 +9,9 @@ import {
   Modal,
   TouchableHighlight,
   StyleSheet,
+  ToastAndroid,
+  ProgressBarAndroid,
+  Platform,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import colors, { sizes, stylesPadrao } from "../../styles/colors";
@@ -19,6 +22,7 @@ import {
   faArrowCircleDown,
   faCat,
   faIdBadge,
+  faSyncAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import DescricaoInput from "../../components/DescricaoInput";
 import {
@@ -32,7 +36,6 @@ import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import PageCamera from "../Camera";
 import { Picker } from "@react-native-community/picker";
-import AsyncStorage from "@react-native-community/async-storage";
 import Loading from "../../components/Loading";
 
 export default function CriarAnimal({ navigation }) {
@@ -40,14 +43,22 @@ export default function CriarAnimal({ navigation }) {
   const [dtNasc, setDtNasc] = useState("");
   const [dtNascMascarado, setDtNascMascarado] = useState("");
   const [cliente_id, setCliente_id] = useState("");
+  const [observacao, setObservacao] = useState("");
+  const [microchip, setMicrochip] = useState("");
+  const [tag, setTag] = useState("");
+  const [sexo, setSexo] = useState("");
+  const [castrado, setCastrado] = useState("");
+  const [cor, setCor] = useState("");
   const [image, setImage] = useState(null);
   const [btnCriarAnimal, setBtnCriarAnimal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleCamera, setModalVisibleCamera] = useState(false);
   const [listaDeClientes, setListaDeClientes] = useState(null);
+  const [loadingCriandoAnimal, setLoadingCriandoAnimal] = useState(false);
 
   const inputNome = useRef(null);
   const inputDtNasc = useRef(null);
+  const inputPicker = useRef(null);
   const btnSalvar = useRef(null);
   const btnEscolherDaGaleria = useRef(null);
   const btnTirarFoto = useRef(null);
@@ -77,9 +88,9 @@ export default function CriarAnimal({ navigation }) {
       aspect: [1, 1],
       quality: 1,
     });
-    console.log(result);
+    // console.log(result);
     if (!result.cancelled) {
-      setImage(result.uri);
+      setImage(result);
     }
   }
 
@@ -97,10 +108,39 @@ export default function CriarAnimal({ navigation }) {
         "Por favor verifique a data digitada!"
       );
       inputDtNasc.current.focus();
+    } else if (cliente_id == "") {
+      Alert.alert(
+        "Escolha um cliente!",
+        "Todo animal deve ter um cliente vinculado a ele!"
+      );
     } else {
-      let response = criarAnimal();
+      const response = await criarAnimal(
+        nome,
+        cliente_id,
+        dtNasc,
+        observacao,
+        microchip,
+        tag,
+        sexo,
+        castrado,
+        cor,
+        image ? image : null
+      );
+      if (response == true) {
+        ToastAndroid.showWithGravity(
+          "Animal criado com sucesso",
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+        setNome("");
+        setCliente_id("");
+        setDtNasc("");
+        setDtNascMascarado("");
+        setImage(null);
+      }
     }
     setBtnCriarAnimal(false);
+    return;
   }
 
   async function listar_clientes() {
@@ -135,6 +175,18 @@ export default function CriarAnimal({ navigation }) {
           </Text>
         </View>
         <ScrollView>
+          {loadingCriandoAnimal &&
+            (Platform.OS == "ios" ? (
+              <Loading styleView={stylesPadrao.loadingProgressBar} />
+            ) : (
+              <ProgressBarAndroid
+                styleAttr="Horizontal"
+                color={colors.letraNormalClaro}
+              />
+            ))}
+          {loadingCriandoAnimal && (
+            <Text style={stylesPadrao.textProgressBar}>Criando animal...</Text>
+          )}
           <DescricaoInput text="Nome do animal:" icon={faCat} />
           <TextInput
             style={stylesPadrao.textInput}
@@ -150,9 +202,44 @@ export default function CriarAnimal({ navigation }) {
               // inputDtNasc.current.focus();
               listar_clientes();
             }}
+            value={nome}
             ref={inputNome}
           />
-          <DescricaoInput text="Cliente/Dono" icon={faIdBadge} />
+          <View style={{ flexDirection: "row" }}>
+            <DescricaoInput text="Cliente/Dono" icon={faIdBadge} />
+            <TouchableHighlight
+              activeOpacity={0.8}
+              underlayColor={colors.darkblue}
+              style={{
+                borderColor: colors.letraNormalClaro,
+                borderWidth: 1,
+                borderRadius: 50,
+                marginRight: getPixelSize(4),
+                marginLeft: "auto",
+                paddingVertical: 8,
+                paddingHorizontal: 3,
+              }}
+              onPress={() => {
+                listar_clientes();
+                return;
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  textAlignVertical: "center",
+                  color: colors.letraNormalClaro,
+                  fontSize: getPixelSize(4),
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faSyncAlt}
+                  color={colors.letraNormalClaro}
+                />
+                Atualizar clientes
+              </Text>
+            </TouchableHighlight>
+          </View>
           <View
             style={{
               ...stylesPadrao.textInput,
@@ -167,18 +254,22 @@ export default function CriarAnimal({ navigation }) {
               itemStyle={styles.pickerItem}
               selectedValue={cliente_id}
               style={styles.picker}
-              onValueChange={(itemValue, itemIndex) => {
+              onValueChange={(itemValue) => {
                 setCliente_id(itemValue);
                 console.log(itemValue);
               }}
+              ref={inputPicker}
             >
+              {listaDeClientes !== null && (
+                <Picker.Item label="Escolha um cliente" value="" key="a" />
+              )}
               {listaDeClientes !== null ? (
                 listaDeClientes.data.map((element, index) => {
                   return (
                     <Picker.Item
                       label={element.nome}
                       value={element.id}
-                      key={element.id}
+                      key={index}
                     />
                   );
                 })
@@ -211,8 +302,8 @@ export default function CriarAnimal({ navigation }) {
             <TouchableOpacity
               onPress={() => {
                 Alert.alert(
-                  "Deseja remover a foto?",
-                  "A foto não será excluída do seu celular, apenas removida daqui!",
+                  "Deseja remover a foto daqui?",
+                  "A foto pode não ser excluída do seu celular, apenas removida daqui!",
                   [
                     {
                       text: "Remover foto",
@@ -230,7 +321,7 @@ export default function CriarAnimal({ navigation }) {
               }}
             >
               <Image
-                source={{ uri: image }}
+                source={{ uri: image.uri }}
                 style={{
                   width: "94%",
                   height: Dimensions.get("screen").width * 0.94,

@@ -119,6 +119,17 @@ export const stylesPadrao = {
     color: colors.letraNormalClaro,
     fontSize: sizes.letraPequena,
   },
+  loadingProgressBar: {
+    flexWrap: "wrap",
+    margin: 0,
+  },
+  textProgressBar: {
+    color: colors.letraNormalClaro,
+    fontSize: sizes.letraPequena,
+    textAlign: "center",
+    borderBottomColor: colors.letraNormalClaro,
+    borderBottomWidth: 2,
+  },
 };
 
 export default colors;
