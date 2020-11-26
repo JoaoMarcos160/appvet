@@ -21,7 +21,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faArrowCircleDown,
   faCat,
+  faChartPie,
+  faChild,
+  faEllipsisH,
   faIdBadge,
+  faMicrochip,
   faSyncAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import DescricaoInput from "../../components/DescricaoInput";
@@ -38,11 +42,13 @@ import PageCamera from "../Camera";
 import { Picker } from "@react-native-community/picker";
 import Loading from "../../components/Loading";
 
-export default function CriarAnimal({ navigation }) {
+export default function CriarAnimal({ route, navigation }) {
   const [nome, setNome] = useState("");
   const [dtNasc, setDtNasc] = useState("");
   const [dtNascMascarado, setDtNascMascarado] = useState("");
-  const [cliente_id, setCliente_id] = useState("");
+  const [cliente_id, setCliente_id] = useState(
+    route.params.clienteId ? route.params.clienteId : ""
+  );
   const [observacao, setObservacao] = useState("");
   const [microchip, setMicrochip] = useState("");
   const [tag, setTag] = useState("");
@@ -52,7 +58,8 @@ export default function CriarAnimal({ navigation }) {
   const [image, setImage] = useState(null);
   const [btnCriarAnimal, setBtnCriarAnimal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalVisibleCamera, setModalVisibleCamera] = useState(false);
+  const [modalVisibleInfo, setModalVisibleInfo] = useState(false);
+  // const [modalVisibleCamera, setModalVisibleCamera] = useState(false);
   const [listaDeClientes, setListaDeClientes] = useState(null);
   const [loadingCriandoAnimal, setLoadingCriandoAnimal] = useState(false);
 
@@ -96,6 +103,7 @@ export default function CriarAnimal({ navigation }) {
 
   async function createAnimal() {
     setBtnCriarAnimal(true);
+    setLoadingCriandoAnimal(true);
     if (nome == "") {
       Alert.alert(
         "Digite um nome",
@@ -140,6 +148,7 @@ export default function CriarAnimal({ navigation }) {
       }
     }
     setBtnCriarAnimal(false);
+    setLoadingCriandoAnimal(false);
     return;
   }
 
@@ -173,8 +182,6 @@ export default function CriarAnimal({ navigation }) {
           >
             *Apenas o nome é obrigatório
           </Text>
-        </View>
-        <ScrollView>
           {loadingCriandoAnimal &&
             (Platform.OS == "ios" ? (
               <Loading styleView={stylesPadrao.loadingProgressBar} />
@@ -187,6 +194,8 @@ export default function CriarAnimal({ navigation }) {
           {loadingCriandoAnimal && (
             <Text style={stylesPadrao.textProgressBar}>Criando animal...</Text>
           )}
+        </View>
+        <ScrollView>
           <DescricaoInput text="Nome do animal:" icon={faCat} />
           <TextInput
             style={stylesPadrao.textInput}
@@ -213,7 +222,7 @@ export default function CriarAnimal({ navigation }) {
               style={{
                 borderColor: colors.letraNormalClaro,
                 borderWidth: 1,
-                borderRadius: 50,
+                borderRadius: 15,
                 marginRight: getPixelSize(4),
                 marginLeft: "auto",
                 paddingVertical: 8,
@@ -236,7 +245,7 @@ export default function CriarAnimal({ navigation }) {
                   icon={faSyncAlt}
                   color={colors.letraNormalClaro}
                 />
-                Atualizar clientes
+                Atualizar lista
               </Text>
             </TouchableHighlight>
           </View>
@@ -261,9 +270,13 @@ export default function CriarAnimal({ navigation }) {
               ref={inputPicker}
             >
               {listaDeClientes !== null && (
-                <Picker.Item label="Escolha um cliente" value="" key="a" />
+                <Picker.Item
+                  label="Clique para escolhe um cliente"
+                  value=""
+                  key="a"
+                />
               )}
-              {listaDeClientes !== null ? (
+              {listaDeClientes !== null && listaDeClientes !== false ? (
                 listaDeClientes.data.map((element, index) => {
                   return (
                     <Picker.Item
@@ -273,8 +286,10 @@ export default function CriarAnimal({ navigation }) {
                     />
                   );
                 })
+              ) : listaDeClientes == false ? (
+                <Picker.Item label="Nenhum cliente encontrado" value="" />
               ) : (
-                <Picker.Item label="Buscando clientes" value="null" />
+                <Picker.Item label="Buscando clientes" value="" />
               )}
             </Picker>
             {listaDeClientes == null && <Loading />}
@@ -345,6 +360,18 @@ export default function CriarAnimal({ navigation }) {
               </Text>
             </TouchableOpacity>
           )}
+          <TouchableOpacity
+            style={{ ...stylesPadrao.button, flex: 1, marginHorizontal: 10 }}
+            onPress={() => {
+              setModalVisibleInfo(true);
+            }}
+            ref={btnSalvar}
+            disabled={btnCriarAnimal}
+          >
+            <Text style={stylesPadrao.textButton}>
+              + Adicionar mais informações
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
         <TouchableOpacity
           style={stylesPadrao.button}
@@ -357,6 +384,70 @@ export default function CriarAnimal({ navigation }) {
           <Text style={stylesPadrao.textButton}>Criar animal</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVisibleInfo}
+      >
+        <ScrollView>
+          <View style={{ backgroundColor: colors.backgroundPadrao }}>
+            <View style={stylesPadrao.viewInput}>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                }}
+              >
+                <View style={{ marginLeft: 7 }}>
+                  <Header title="Outras informações" />
+                </View>
+                <TouchableHighlight
+                  onPress={() => {
+                    setModalVisibleInfo(false);
+                  }}
+                  style={{
+                    flex: 1,
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: colors.letraNormalClaro,
+                      fontSize: getPixelSize(7),
+                      textAlign: "right",
+                      padding: 5,
+                      margin: 5,
+                    }}
+                  >
+                    X
+                  </Text>
+                </TouchableHighlight>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.letraNormalClaro,
+                    margin: 5,
+                    opacity: 0.8,
+                  }}
+                >
+                  Role a tela para mais informações
+                </Text>
+                <FontAwesomeIcon
+                  icon={faArrowCircleDown}
+                  color={colors.letraNormalClaro}
+                />
+              </View>
+              <DescricaoInput text="toma" icon={faMicrochip} />
+            </View>
+          </View>
+        </ScrollView>
+      </Modal>
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View
           style={{

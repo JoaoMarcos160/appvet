@@ -155,8 +155,11 @@ export async function criarCliente(
       email: email,
       observacao: observacao,
     });
-    console.log(response.data.data);
-    return true;
+    // console.log(response.data.data);
+    if (response.status == 201) {
+      return response.data.data.id;
+    }
+    return false;
   } catch (response) {
     console.warn(response);
     if (response.data.data.msg) {
@@ -184,11 +187,7 @@ export async function validarUsuarios(user, password) {
       await preencherToken(response.data.data.token);
       await preencherUsuario(response.data.data.id);
       // console.log(AsyncStorage.getItem("@appvet:data_criacao"));
-      ToastAndroid.showWithGravity(
-        messages.login_sucesso,
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM
-      );
+      ToastAndroid.show(messages.login_sucesso, ToastAndroid.SHORT);
       return true;
     }
     Alert.alert(response.data.data.msg);
@@ -351,6 +350,10 @@ export async function listarClientes() {
     });
     // console.log(response.data.data);
     if (response.status == 200) {
+      if (response.data.data.msg == "Nenhum cliente encontrado") {
+        console.log(response.data.data.msg);
+        return false;
+      }
       console.log("Clientes listados com sucesso");
       return response.data;
     }

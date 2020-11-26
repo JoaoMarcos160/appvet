@@ -199,12 +199,32 @@ export default function CriarCliente({ navigation }) {
         email,
         observacao
       );
-      if (result) {
+      if (result == false) {
+        ToastAndroid.showWithGravity(
+          "Não foi possível criar",
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER
+        );
+      } else {
         //Sai do foco de todos os campos
         inputNome.current.blur();
         inputCpf.current.blur();
         inputTelefone.current.blur();
 
+        Alert.alert("Criar um animal para " + nome + "?", "id: " + result, [
+          {
+            text: "Sim",
+            style: "default",
+            onPress: () => {
+              console.log("cliente id criado: " + result);
+              navigation.navigate("Criar Animal", { clienteId: result });
+            },
+          },
+          {
+            text: "Não",
+            style: "destructive",
+          },
+        ]);
         //Seta todos os estados para seu estado inicial e limpa todos os campos
         setNome("");
         setCpf("");
@@ -230,12 +250,6 @@ export default function CriarCliente({ navigation }) {
           ToastAndroid.CENTER
         );
         navigation.navigate("Home");
-      } else {
-        ToastAndroid.showWithGravity(
-          "Não foi possível criar",
-          ToastAndroid.LONG,
-          ToastAndroid.CENTER
-        );
       }
     }
     setBtnCriarCliente(false);
@@ -341,7 +355,7 @@ export default function CriarCliente({ navigation }) {
               ref={modalInformacoes}
             >
               <ScrollView>
-                <View style={stylesPadrao.background}>
+                <View style={{ backgroundColor: colors.backgroundPadrao }}>
                   <View style={stylesPadrao.viewInput}>
                     <View
                       style={{
@@ -374,7 +388,6 @@ export default function CriarCliente({ navigation }) {
                         </Text>
                       </TouchableHighlight>
                     </View>
-                    {/* <Text style={stylesPadrao.text}>Outras informações</Text> */}
                     <View
                       style={{
                         flexDirection: "row",
@@ -626,21 +639,21 @@ export default function CriarCliente({ navigation }) {
                       </Text>
                     </TouchableOpacity>
                   </View>
+                  <AdMobBanner
+                    bannerSize="smartBannerPortrait"
+                    // adUnitID="ca-app-pub-3940256099942544/6300978111"
+                    adUnitID="ca-app-pub-1947127811333876/7886829387"
+                    servePersonalizedAds={true}
+                    onDidFailToReceiveAdWithError={(text) => {
+                      console.log("Erro ao carregar anúncio: ");
+                      console.log(text);
+                    }}
+                    style={{
+                      borderColor: colors.letraNormalClaro,
+                      borderWidth: 2,
+                    }}
+                  />
                 </View>
-                <AdMobBanner
-                  bannerSize="smartBannerPortrait"
-                  // adUnitID="ca-app-pub-3940256099942544/6300978111"
-                  adUnitID="ca-app-pub-1947127811333876/7886829387"
-                  servePersonalizedAds={true}
-                  onDidFailToReceiveAdWithError={(text) => {
-                    console.log("Erro ao carregar anúncio: ");
-                    console.log(text);
-                  }}
-                  style={{
-                    borderColor: colors.letraNormalClaro,
-                    borderWidth: 2,
-                  }}
-                />
               </ScrollView>
             </Modal>
           </View>

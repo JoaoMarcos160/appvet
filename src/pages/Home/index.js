@@ -56,9 +56,8 @@ export default function Home({ navigation }) {
             flexDirection: "row",
             borderColor: colors.letraNormalClaro,
             borderBottomWidth: 1,
-            backgroundColor: "#000",
+            backgroundColor: "#002",
             opacity: 0.9,
-            // borderRadius: 8,
           }}
         >
           <TouchableOpacity
@@ -110,7 +109,7 @@ export default function Home({ navigation }) {
               <TouchableOpacity
                 style={styles.touchableBotoes}
                 onPress={() => {
-                  navigation.navigate("Criar Animal");
+                  navigation.navigate("Criar Animal", { clienteId: null });
                 }}
               >
                 <BotoesHome text="Criar Animal" icon={faDog} />
@@ -161,7 +160,8 @@ export default function Home({ navigation }) {
           </SafeAreaView>
           <AdMobBanner
             bannerSize="smartBannerPortrait"
-            adUnitID="ca-app-pub-1947127811333876/7886829387"
+            // adUnitID="ca-app-pub-1947127811333876/7886829387"
+            adUnitID="ca-app-pub-3940256099942544/6300978111"
             servePersonalizedAds={true}
             onDidFailToReceiveAdWithError={(text) => {
               console.log("Erro ao carregar anúncio: ");
