@@ -2,7 +2,6 @@ import { Platform, PixelRatio, Alert, ToastAndroid } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import api, { apiViaCep } from "./services/api";
 import { messages } from "./messages";
-import { or } from "react-native-reanimated";
 import { AdMobInterstitial, AdMobRewarded } from "expo-ads-admob";
 
 export function getPixelSize(pixels) {
@@ -58,7 +57,7 @@ async function preencherToken(token) {
 export async function criarUsuario(nome, login, senha, permissao, navigation) {
   console.log("Nome: " + nome);
   try {
-    const response = await api.post("/usuarios/", {
+    const response = await api.post("/usuarios", {
       login: login,
       senha: senha,
       nome: nome,
@@ -138,7 +137,8 @@ export async function criarCliente(
     const token = await AsyncStorage.getItem("@appvet:token");
     const usuario = await carregarUsuario();
     let dtConvertida = converterDataParaApi(dtNasc);
-    const response = await api.post("/clientes/", {
+
+    const response = await api.post("/clientes", {
       token: token,
       usuario_id: usuario.id,
       nome: nome,
@@ -155,7 +155,7 @@ export async function criarCliente(
       email: email,
       observacao: observacao,
     });
-    // console.log(response.data.data);
+    console.log(response.data.data);
     if (response.status == 201) {
       return response.data.data.id;
     }
@@ -355,14 +355,14 @@ export async function listarClientes() {
         return false;
       }
       console.log("Clientes listados com sucesso");
-      return response.data;
+      return response.data.data;
     }
     Alert.alert(response.data.data.msg);
     return false;
   } catch (response) {
     console.log("ENTREI NO CATCH");
     console.log("response: ");
-    console.log(response);
+    console.table(response);
     alertsProblemaConexao(response.problem);
     return false;
   }
@@ -443,5 +443,29 @@ export async function criarAnimal(
     console.log(response);
     alertsProblemaConexao(response.problem);
     return false;
+  }
+}
+
+async function buscarClientes(
+  nome,
+  cpf,
+  telefone,
+  endereco,
+  numero,
+  bairro,
+  complemento,
+  cidade,
+  estado,
+  cep,
+  dt_nasc,
+  observacao,
+  email,
+  created_at,
+  updated_at
+) {
+  try {
+    //colocar aqui pra buscar na api pelos parametros acima listados
+  } catch (response) {
+    console.error(response);
   }
 }

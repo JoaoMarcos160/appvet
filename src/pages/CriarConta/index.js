@@ -47,29 +47,43 @@ export default function CriarConta({ navigation }) {
   }
 
   async function criarUser() {
-    // console.log(nome);
-    // console.log(login);
-    // console.log(senha);
-    // console.log(senhaConfirm);
+    const regex_email = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gi;
     if (nome == "") {
       Alert.alert("Digite seu nome");
       inputNome.current.focus();
-    } else if (nome.length < 3) {
+      return;
+    }
+    if (nome.length < 3) {
       Alert.alert("Nome inválido");
       inputNome.current.focus();
-    } else if (nome.search(" ") < 0) {
+      return;
+    }
+    if (nome.search(" ") < 0) {
       Alert.alert("Digite seu nome completo");
       inputNome.current.focus();
-    } else if ("" == login) {
+      return;
+    }
+    if ("" == login) {
       Alert.alert("Digite um login");
       inputLogin.current.focus();
-    } else if ("" == senha) {
+      return;
+    }
+    if (!regex_email.test(login)) {
+      Alert.alert("Email inválido");
+      inputLogin.current.focus();
+      return;
+    }
+    if ("" == senha) {
       Alert.alert("Digite uma senha");
       inputSenha.current.focus();
-    } else if ("" == senhaConfirm) {
+      return;
+    }
+    if ("" == senhaConfirm) {
       Alert.alert("Confime sua senha");
       inputSenhaConfirm.current.focus();
-    } else if (senha !== senhaConfirm) {
+      return;
+    }
+    if (senha !== senhaConfirm) {
       Alert.alert(
         "As senhas não coincidem!",
         "As senhas não estão iguais, verifique!"
@@ -77,25 +91,29 @@ export default function CriarConta({ navigation }) {
       inputSenha.current.clear();
       inputSenhaConfirm.current.clear();
       inputSenha.current.focus();
-    } else if (senha.length < 6) {
+      return;
+    }
+    if (senha.length < 6) {
       Alert.alert(
         "Senha muito pequena!",
         "Digite uma senha com pelo menos 6 caracteres"
       );
-    } else if (!termosDeUso) {
+      return;
+    }
+    if (!termosDeUso) {
       Alert.alert(
         "Aceite nossos termos de uso!",
         "Leia atentamente nossos termos de uso do App! 😊"
       );
+      return;
+    }
+    console.log("Requisição para criar usuario feita!");
+    const result = await criarUsuario(nome, login, senha, 1, navigation);
+    if (!result) {
+      inputLogin.current.clear();
+      inputLogin.current.focus();
     } else {
-      console.log("Requisição para criar usuario feita!");
-      const result = await criarUsuario(nome, login, senha, 1, navigation);
-      if (!result) {
-        inputLogin.current.clear();
-        inputLogin.current.focus();
-      } else {
-        navigation.navigate("Home");
-      }
+      navigation.navigate("Home");
     }
   }
 

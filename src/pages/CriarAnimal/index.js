@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   TouchableHighlight,
   StyleSheet,
   ToastAndroid,
-  ProgressBarAndroid,
   Platform,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
@@ -21,12 +20,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faArrowCircleDown,
   faCat,
-  faChartPie,
-  faChild,
-  faEllipsisH,
   faIdBadge,
   faMicrochip,
-  faSyncAlt,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import DescricaoInput from "../../components/DescricaoInput";
 import {
@@ -37,42 +33,48 @@ import {
   validarData,
 } from "../../utils";
 import * as ImagePicker from "expo-image-picker";
-import { Camera } from "expo-camera";
-import PageCamera from "../Camera";
-import { Picker } from "@react-native-community/picker";
 import Loading from "../../components/Loading";
+import { debounce } from "lodash";
 
-export default function CriarAnimal({ route, navigation }) {
+export default function CriarAnimal({ route }) {
   const [nome, setNome] = useState("");
   const [dtNasc, setDtNasc] = useState("");
   const [dtNascMascarado, setDtNascMascarado] = useState("");
   const [cliente_id, setCliente_id] = useState(
     route.params.clienteId ? route.params.clienteId : ""
   );
-  const [observacao, setObservacao] = useState("");
-  const [microchip, setMicrochip] = useState("");
-  const [tag, setTag] = useState("");
-  const [sexo, setSexo] = useState("");
-  const [castrado, setCastrado] = useState("");
-  const [cor, setCor] = useState("");
+  const [observacao] = useState("");
+  const [microchip] = useState("");
+  const [tag] = useState("");
+  const [sexo] = useState("");
+  const [castrado] = useState("");
+  const [cor] = useState("");
   const [image, setImage] = useState(null);
   const [btnCriarAnimal, setBtnCriarAnimal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleInfo, setModalVisibleInfo] = useState(false);
+  const [modalVisibleEscolherCliente] = useState(false);
   // const [modalVisibleCamera, setModalVisibleCamera] = useState(false);
-  const [listaDeClientes, setListaDeClientes] = useState(null);
+  const [, setListaDeClientes] = useState(null);
   const [loadingCriandoAnimal, setLoadingCriandoAnimal] = useState(false);
 
   const inputNome = useRef(null);
   const inputDtNasc = useRef(null);
-  const inputPicker = useRef(null);
+  const inputNomeDono = useRef(null);
   const btnSalvar = useRef(null);
   const btnEscolherDaGaleria = useRef(null);
   const btnTirarFoto = useRef(null);
 
-  useEffect(() => {
-    listar_clientes();
-  }, []);
+  // useEffect(() => {
+  //   listar_clientes();
+  // }, []);
+
+const handler = useCallback(debounce(buscar, 2000), []);
+
+const onChange = (event) => {
+    // perform any event related action here
+    handler();
+ };
 
   useEffect(() => {
     async () => {
@@ -160,17 +162,6 @@ export default function CriarAnimal({ route, navigation }) {
     <SafeAreaView style={stylesPadrao.background}>
       <Header title="Criar Animal" />
       <View style={stylesPadrao.container}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text
-            style={{ color: colors.letraNormalClaro, margin: 5, opacity: 0.8 }}
-          >
-            Role a tela para mais informações
-          </Text>
-          <FontAwesomeIcon
-            icon={faArrowCircleDown}
-            color={colors.letraNormalClaro}
-          />
-        </View>
         <View>
           <Text
             style={{
@@ -180,16 +171,17 @@ export default function CriarAnimal({ route, navigation }) {
               fontSize: sizes.letraMinuscula,
             }}
           >
-            *Apenas o nome é obrigatório
+            *Apenas o nome e o dono são obrigatórios
           </Text>
           {loadingCriandoAnimal &&
             (Platform.OS == "ios" ? (
               <Loading styleView={stylesPadrao.loadingProgressBar} />
             ) : (
-              <ProgressBarAndroid
-                styleAttr="Horizontal"
-                color={colors.letraNormalClaro}
-              />
+              <Loading />
+              // <ProgressBarAndroid
+              //   styleAttr="Horizontal"
+              //   color={colors.letraNormalClaro}
+              // />
             ))}
           {loadingCriandoAnimal && (
             <Text style={stylesPadrao.textProgressBar}>Criando animal...</Text>
@@ -216,7 +208,7 @@ export default function CriarAnimal({ route, navigation }) {
           />
           <View style={{ flexDirection: "row" }}>
             <DescricaoInput text="Cliente/Dono" icon={faIdBadge} />
-            <TouchableHighlight
+            {/* <TouchableHighlight
               activeOpacity={0.8}
               underlayColor={colors.darkblue}
               style={{
@@ -247,52 +239,38 @@ export default function CriarAnimal({ route, navigation }) {
                 />
                 Atualizar lista
               </Text>
-            </TouchableHighlight>
+            </TouchableHighlight> */}
           </View>
           <View
             style={{
-              ...stylesPadrao.textInput,
-              paddingBottom: 20,
-              paddingTop: 0,
+              flexDirection: "row",
             }}
           >
-            <Picker
-              mode="dialog"
-              prompt="Escolha o cliente:"
-              removeClippedSubviews={true}
-              itemStyle={styles.pickerItem}
-              selectedValue={cliente_id}
-              style={styles.picker}
-              onValueChange={(itemValue) => {
-                setCliente_id(itemValue);
-                console.log(itemValue);
+            <TextInput
+              style={{ ...stylesPadrao.textInput, marginRight: 5 }}
+              placeholder="Digite aqui um nome para buscar"
+              placeholderTextColor={colors.placeHolderColor}
+              autoCompleteType="off"
+              keyboardType="default"
+              maxLength={10}
+              onChangeText={(nomeDono) => {}}
+              onSubmitEditing={() => {}}
+              clearButtonMode="unless-editing"
+              // value={dtNascMascarado}
+              ref={inputNomeDono}
+            />
+            <FontAwesomeIcon
+              icon={faSearch}
+              size={sizes.letraGrande}
+              color={colors.letraNormalClaro}
+              style={{
+                ...stylesPadrao.icon,
+                marginRight: 5,
+                marginLeft: "1%",
+                padding: 0,
               }}
-              ref={inputPicker}
-            >
-              {listaDeClientes !== null && (
-                <Picker.Item
-                  label="Clique para escolhe um cliente"
-                  value=""
-                  key="a"
-                />
-              )}
-              {listaDeClientes !== null && listaDeClientes !== false ? (
-                listaDeClientes.data.map((element, index) => {
-                  return (
-                    <Picker.Item
-                      label={element.nome}
-                      value={element.id}
-                      key={index}
-                    />
-                  );
-                })
-              ) : listaDeClientes == false ? (
-                <Picker.Item label="Nenhum cliente encontrado" value="" />
-              ) : (
-                <Picker.Item label="Buscando clientes" value="" />
-              )}
-            </Picker>
-            {listaDeClientes == null && <Loading />}
+            />
+            {/* {listaDeClientes == null && <Loading />} */}
           </View>
           <DescricaoInput text="Data de nascimento:" />
           <TextInput
@@ -443,7 +421,7 @@ export default function CriarAnimal({ route, navigation }) {
                   color={colors.letraNormalClaro}
                 />
               </View>
-              <DescricaoInput text="toma" icon={faMicrochip} />
+              <DescricaoInput text="Microchip" icon={faMicrochip} />
             </View>
           </View>
         </ScrollView>
@@ -532,19 +510,11 @@ export default function CriarAnimal({ route, navigation }) {
       >
         <PageCamera />
       </Modal> */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisibleEscolherCliente}
+      ></Modal>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  pickerItem: {
-    color: colors.letraNormalClaro,
-    backgroundColor: colors.backgroundPadrao,
-  },
-  picker: {
-    color: colors.letraNormalClaro,
-    borderWidth: 1,
-    borderColor: colors.letraNormalClaro,
-    width: "auto",
-  },
-});
