@@ -47,7 +47,8 @@ export default function CriarConta({ navigation }) {
   }
 
   async function criarUser() {
-    const regex_email = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gi;
+    const regex_email =
+      /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gi;
     if (nome == "") {
       Alert.alert("Digite seu nome");
       inputNome.current.focus();
@@ -136,10 +137,10 @@ export default function CriarConta({ navigation }) {
             />
           </View>
           <View style={styles.viewInput}>
-            <DescricaoInput text="Login (Nome de Usuário):" icon={faUserAlt} />
+            <DescricaoInput text="Email:" icon={faUserAlt} />
             <TextInput
               style={styles.textInput}
-              placeholder="Digite um nome de usuário aqui"
+              placeholder="Digite seu email aqui"
               placeholderTextColor={colors.placeHolderColor}
               autoCompleteType="email"
               autoCapitalize="none"
